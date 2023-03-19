@@ -54,8 +54,14 @@ function searchTool() {
 		textarea.value = updatedLines.join('\n');
 	}
 
-	// Function to remove spaces before and after each line in the textarea
 	function removeSpacesFromLines(textarea) {
+		const lines = textarea.value.split('\n');
+		const formattedLines = lines.map(line => line.replace(/^\s+/, ''));
+		textarea.value = formattedLines.join('\n');
+	}
+	
+	// Function to remove spaces before and after each line in the textarea
+	function trimLines(textarea) {
 		const lines = textarea.value.split('\n');
 		const formattedLines = lines.map(line => line.trim());
 		textarea.value = formattedLines.join('\n');
@@ -103,51 +109,66 @@ function searchTool() {
 		const elementsToExclude = ['SCRIPT', 'STYLE', 'NOSCRIPT', 'IFRAME', 'A', 'H1', 'TITLE'];
 
 		const regexQuery = query.split('\n').map(line => ({
-		  regexCaseSensitive: new RegExp(`\\b${line}\\b`, 'g'), // Case sensitive
-		  regex: new RegExp(`\\b${line}\\b`, 'ig'), // Case insensitive
-		  count: 0
+			regexCaseSensitive: new RegExp(`\\b${line}\\b`, 'g'), // Case sensitive
+			regex: new RegExp(`\\b${line}\\b`, 'ig'), // Case insensitive
+			count: 0
 		}));
 
-		// Get all elements and then filter out the excluded ones
-		const elements = Array.from(document.querySelectorAll('*')).filter(element => {
-		  return !elementsToExclude.includes(element.nodeName);
+		// Get all <p> elements and then filter out the excluded ones
+		const elements = Array.from(document.getElementsByTagName('p')).filter(element => {
+			return !elementsToExclude.includes(element.nodeName);
 		});
 
 		elements.forEach(element => {
-		  if(element !== textarea) { // Exclude the textarea from processing
-			restoreOriginalHTML(element);
-		  }
+			if (element !== textarea) { // Exclude the textarea from processing
+				restoreOriginalHTML(element);
+			}
 
-		  for (const queryItem of regexQuery) {
-			element.childNodes.forEach(childNode => {
-			  if(childNode.nodeType === 3 && childNode.textContent.match(queryItem.regex)) { // Only process text nodes
-				const matches = childNode.textContent.match(queryItem.regex);
-				queryItem.count += matches ? matches.length : 0;
+			for (const queryItem of regexQuery) {
+				const spanNodes = element.querySelectorAll('p > span'); // Get <span> elements within the <p>
 
-				const replacementNode = document.createElement("span");
+				// Iterate through span nodes only within the current element
+				for (const spanNode of spanNodes) {
+					if (spanNode.textContent.match(queryItem.regex)) {
+						const matches = spanNode.textContent.match(queryItem.regex);
+						queryItem.count += matches ? matches.length : 0;
 
-				// Replacing the matched text with spans of the appropriate color
-				const htmlText = childNode.textContent.replace(queryItem.regex, match => {
-				  if(match.match(queryItem.regexCaseSensitive)) {
-					return `<span class="restore" style="background-color: #32FF7E;">${match}</span>`;
-				  } else {
-					return `<span class="restore" style="background-color: #FFC048;">${match}</span>`;
-				  }
+						const replacementNode = document.createElement('span');
+
+						const htmlText = spanNode.innerHTML.replace(queryItem.regex, match => {
+							if (match.match(queryItem.regexCaseSensitive)) {
+								return `<span class='restore' style='background-color: #32FF7E;'>${match}</span>`;
+							} else {
+								return `<span class='restore' style='background-color: #FFC048;'>${match}</span>`;
+							}
+						});
+
+						replacementNode.innerHTML = htmlText;
+						spanNode.replaceWith(replacementNode);
+					}
+				}
+
+				// Process remaining text nodes in the element
+				element.childNodes.forEach(childNode => {
+					if (childNode.nodeType === 3 && childNode.textContent.match(queryItem.regex)) { // Only process text nodes
+						const matches = childNode.textContent.match(queryItem.regex);
+						queryItem.count += matches ? matches.length : 0;
+
+						const replacementNode = document.createElement('span');
+
+						const htmlText = childNode.textContent.replace(queryItem.regex, match => {
+							if (match.match(queryItem.regexCaseSensitive)) {
+								return `<span class='restore' style='background-color: #32FF7E;'>${match}</span>`;
+							} else {
+								return `<span class='restore' style='background-color: #FFC048;'>${match}</span>`;
+							}
+						});
+
+						replacementNode.innerHTML = htmlText;
+						element.replaceChild(replacementNode, childNode);
+					}
 				});
-
-				replacementNode.innerHTML = htmlText;
-				element.replaceChild(replacementNode, childNode);
-			  }
-			});
-
-			// Also process the highlighted nodes
-			const highlightedNodes = Array.from(element.querySelectorAll('*')).filter(node => node.nodeType === 3 && node.textContent.match(queryItem.regex));
-
-			highlightedNodes.forEach(highlightedNode => {
-			  const matches = highlightedNode.textContent.match(queryItem.regex);
-			  queryItem.count += matches ? matches.length : 0;
-			});
-		  }
+			}
 		});
 
 		return regexQuery;
@@ -191,6 +212,9 @@ function searchTool() {
 
 	// Updated event listener for the "Find Match" button
 	button.addEventListener('click', () => {
+		rearrangeTextArea();
+		
+		trimLines(textarea)
 		resetAll();
 
 		const userInput = textarea.value.trim().replace(/\(\d+\)$/gm, '').trim();
@@ -202,4 +226,40 @@ function searchTool() {
 		  alert('Please enter a text to search');
 		}
 	});
+	
+	// Add event listener for keyboard input
+	document.addEventListener('keydown', (event) => {
+		if (event.ctrlKey && event.key === 'b') {   // Trigger the findMatch function when "ctrl" + "b" is pressed
+			rearrangeTextArea();
+			
+			trimLines(textarea)
+			resetAll();
+
+			const userInput = textarea.value.trim().replace(/\(\d+\)$/gm, '').trim();
+
+			if(userInput) {
+			  const queryResult = highlightMatchesAndCount(userInput);
+			  updateMatchCount(queryResult);
+			} else {
+			  alert('Please enter a text to search');
+			}
+		}
+	});
+	
+	function reorderLinesDescending(text) {
+		const linesArray = text.split('\n');
+		const sortedLines = linesArray.sort((a, b) => b.length - a.length);
+		return sortedLines.join('\n');
+	}
+
+	function rearrangeTextArea() {
+		// Get the value from the textarea and trim it
+		let userInput = textarea.value.trim().replace(/\(\d+\)$/gm, '').trim();
+
+		if (userInput) {
+			// Reorder the lines in the textarea starting from the highest to the lowest
+			const reorderedInput = reorderLinesDescending(userInput);
+			textarea.value = reorderedInput;
+		}
+	}
 }
