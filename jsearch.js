@@ -1,6 +1,7 @@
 searchTool();
 
-function searchTool() {
+function searchTool(
+) {
 	// Function to sanitize and restore the original HTML
 	function restoreOriginalHTML(element) {
 		element.querySelectorAll('span.restore').forEach(node => {
@@ -10,7 +11,8 @@ function searchTool() {
 	}
 
 	// Function to reset highlights and match counts
-	function resetAll() {
+	function resetAll(
+) {
 		const elementsToExclude = ['SCRIPT', 'STYLE', 'NOSCRIPT', 'IFRAME', 'A', 'H1', 'TITLE'];
 
 		// Get all elements and then filter out the excluded ones
@@ -109,66 +111,51 @@ function searchTool() {
 		const elementsToExclude = ['SCRIPT', 'STYLE', 'NOSCRIPT', 'IFRAME', 'A', 'H1', 'TITLE'];
 
 		const regexQuery = query.split('\n').map(line => ({
-			regexCaseSensitive: new RegExp(`\\b${line}\\b`, 'g'), // Case sensitive
-			regex: new RegExp(`\\b${line}\\b`, 'ig'), // Case insensitive
-			count: 0
+		  regexCaseSensitive: new RegExp(`\\b${line}\\b`, 'g'), // Case sensitive
+		  regex: new RegExp(`\\b${line}\\b`, 'ig'), // Case insensitive
+		  count: 0
 		}));
 
-		// Get all <p> elements and then filter out the excluded ones
-		const elements = Array.from(document.getElementsByTagName('p')).filter(element => {
-			return !elementsToExclude.includes(element.nodeName);
+		// Get all elements and then filter out the excluded ones
+		const elements = Array.from(document.querySelectorAll('*')).filter(element => {
+		  return !elementsToExclude.includes(element.nodeName);
 		});
 
 		elements.forEach(element => {
-			if (element !== textarea) { // Exclude the textarea from processing
-				restoreOriginalHTML(element);
-			}
+		  if(element !== textarea) { // Exclude the textarea from processing
+			restoreOriginalHTML(element);
+		  }
 
-			for (const queryItem of regexQuery) {
-				const spanNodes = element.querySelectorAll('p > span'); // Get <span> elements within the <p>
+		  for (const queryItem of regexQuery) {
+			element.childNodes.forEach(childNode => {
+			  if(childNode.nodeType === 3 && childNode.textContent.match(queryItem.regex)) { // Only process text nodes
+				const matches = childNode.textContent.match(queryItem.regex);
+				queryItem.count += matches ? matches.length : 0;
 
-				// Iterate through span nodes only within the current element
-				for (const spanNode of spanNodes) {
-					if (spanNode.textContent.match(queryItem.regex)) {
-						const matches = spanNode.textContent.match(queryItem.regex);
-						queryItem.count += matches ? matches.length : 0;
+				const replacementNode = document.createElement("span");
 
-						const replacementNode = document.createElement('span');
-
-						const htmlText = spanNode.innerHTML.replace(queryItem.regex, match => {
-							if (match.match(queryItem.regexCaseSensitive)) {
-								return `<span class='restore' style='background-color: #32FF7E;'>${match}</span>`;
-							} else {
-								return `<span class='restore' style='background-color: #FFC048;'>${match}</span>`;
-							}
-						});
-
-						replacementNode.innerHTML = htmlText;
-						spanNode.replaceWith(replacementNode);
-					}
-				}
-
-				// Process remaining text nodes in the element
-				element.childNodes.forEach(childNode => {
-					if (childNode.nodeType === 3 && childNode.textContent.match(queryItem.regex)) { // Only process text nodes
-						const matches = childNode.textContent.match(queryItem.regex);
-						queryItem.count += matches ? matches.length : 0;
-
-						const replacementNode = document.createElement('span');
-
-						const htmlText = childNode.textContent.replace(queryItem.regex, match => {
-							if (match.match(queryItem.regexCaseSensitive)) {
-								return `<span class='restore' style='background-color: #32FF7E;'>${match}</span>`;
-							} else {
-								return `<span class='restore' style='background-color: #FFC048;'>${match}</span>`;
-							}
-						});
-
-						replacementNode.innerHTML = htmlText;
-						element.replaceChild(replacementNode, childNode);
-					}
+				// Replacing the matched text with spans of the appropriate color
+				const htmlText = childNode.textContent.replace(queryItem.regex, match => {
+				  if(match.match(queryItem.regexCaseSensitive)) {
+					return `<span class="restore" style="background-color: #32FF7E;">${match}</span>`;
+				  } else {
+					return `<span class="restore" style="background-color: #FFC048;">${match}</span>`;
+				  }
 				});
-			}
+
+				replacementNode.innerHTML = htmlText;
+				element.replaceChild(replacementNode, childNode);
+			  }
+			});
+
+			// Also process the highlighted nodes
+			const highlightedNodes = Array.from(element.querySelectorAll('*')).filter(node => node.nodeType === 3 && node.textContent.match(queryItem.regex));
+
+			highlightedNodes.forEach(highlightedNode => {
+			  const matches = highlightedNode.textContent.match(queryItem.regex);
+			  queryItem.count += matches ? matches.length : 0;
+			});
+		  }
 		});
 
 		return regexQuery;
@@ -252,7 +239,9 @@ function searchTool() {
 		return sortedLines.join('\n');
 	}
 
-	function rearrangeTextArea() {
+	
+	function rearrangeTextArea(
+) {
 		// Get the value from the textarea and trim it
 		let userInput = textarea.value.trim().replace(/\(\d+\)$/gm, '').trim();
 
