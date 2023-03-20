@@ -19,6 +19,8 @@ function jsearch() {
 			right: 0;
 			background-color: #f2f2f2;
 			padding: 20px;
+			max-height: 70vh;
+			overflow-y: auto;
 			z-index: 9999;
 			font-family: Arial, Helvetica, sans-serif;
 		}
