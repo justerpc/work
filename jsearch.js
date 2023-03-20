@@ -126,24 +126,24 @@ function jsearch() {
 			}
 		});
 
-		textArray.forEach(text => {
-			const words = text.toLowerCase().split(/\W+/);
-			inputLines.forEach(line => {
-				if (line.trim() !== '') {
-					let matchFound = false;
-					words.forEach(word => {
-						if (word === line.toLowerCase()) {
-							matchFound = true;
-						}
-					});
+		// Regex to match start/end of string or a non-alphanumeric character
+		const wordBoundary = /(^|\W)$1(\W|$)/;
 
-					if (matchFound) {
-						matchCount[line.toLowerCase()]++;
-						if (text.includes(line)) {
-							caseSensitiveMatchCount[line]++;
-						}
-					}
-				}
+		textArray.forEach(text => {
+			Object.keys(matchCount).forEach(lineLower => {
+				const line = inputLines.find(item => item.toLowerCase() === lineLower);
+
+				// Check if the lowercase line occurs surrounded by non-alphanumeric characters or the start/end of the string
+				const lineLowerRegex = new RegExp(`(^|\\W)${lineLower}(\\W|$)`, 'gi');
+				const lineLowerMatches = text.toLowerCase().match(lineLowerRegex);
+
+				// Check if the original case line occurs surrounded by non-alphanumeric characters or the start/end of the string
+				const lineRegex = new RegExp(`(^|\\W)${line}(\\W|$)`, 'g');
+				const lineMatches = text.match(lineRegex);
+
+				// Increase count for each complete word match found
+				if (lineLowerMatches) matchCount[lineLower] += lineLowerMatches.length;
+				if (lineMatches) caseSensitiveMatchCount[line] += lineMatches.length;
 			});
 		});
 
