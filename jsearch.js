@@ -204,22 +204,33 @@ function jsearch() {
 		const textValues = [];
 
 		function getTextRecursively(element) {
-			for (let node of element.childNodes) {
-				// Skip the excluded element (container)
-				if (node !== excludedElement) {
-					if (node.nodeType === Node.TEXT_NODE && node.textContent.trim()) {
-						textValues.push(node.textContent.trim());
-					} else if (node.nodeType === Node.ELEMENT_NODE) {
-						getTextRecursively(node);
-					}
-				}
+		// Get the computed value of "display" and "visibility" properties
+		const displayValue = window.getComputedStyle(element).getPropertyValue('display');
+		const visibilityValue = window.getComputedStyle(element).getPropertyValue('visibility');
+
+		// Check if the parent element has style property "display: none" or "visibility: hidden".
+		const isHidden = (displayValue === 'none') || (visibilityValue === 'hidden');
+
+		if (!isHidden && element.childNodes) {
+		  for (let node of element.childNodes) {
+			if (node !== excludedElement) {
+			  if (node.nodeType === Node.TEXT_NODE && node.textContent.trim()) {
+				textValues.push(node.textContent.trim());
+			  } else if (node.nodeType === Node.ELEMENT_NODE) {
+				// If the element is not hidden, we proceed with extracting text recursively:
+				getTextRecursively(node);
+			  }
 			}
+		  }
+		}
 		}
 
+		// Call the recursive function on the parent element:
 		getTextRecursively(parentElement);
 
 		return textValues;
 	}
+
 	
 	// Function to remove spaces before and after each line in the textarea
 	function trimLines(inputText) {
