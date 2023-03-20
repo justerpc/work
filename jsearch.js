@@ -126,23 +126,22 @@ function jsearch() {
 			}
 		});
 
-		// Updating the regular expressions to allow for matching of phrases
+		// Regex to match start/end of string or a non-alphanumeric character
+		const wordBoundary = /(^|\W)$1(\W|$)/;
+
 		textArray.forEach(text => {
 			Object.keys(matchCount).forEach(lineLower => {
 				const line = inputLines.find(item => item.toLowerCase() === lineLower);
 
-				const escapedLineLower = lineLower.replace(/[.*+\-?^${}()|[\]\\]/g, '\\$&');
-				const escapedLine = line.replace(/[.*+\-?^${}()|[\]\\]/g, '\\$&');
-
-				// Check if the lowercase line occurs either surrounded by non-alphanumeric characters or at the start/end of the string
-				const lineLowerRegex = new RegExp(`(^|\\W)${escapedLineLower}(\\W|$)`, 'gi');
+				// Check if the lowercase line occurs surrounded by non-alphanumeric characters or the start/end of the string
+				const lineLowerRegex = new RegExp(`(^|\\W)${lineLower}(\\W|$)`, 'gi');
 				const lineLowerMatches = text.toLowerCase().match(lineLowerRegex);
 
-				// Check if the original case line occurs either surrounded by non-alphanumeric characters or at the start/end of the string
-				const lineRegex = new RegExp(`(^|\\W)${escapedLine}(\\W|$)`, 'g');
+				// Check if the original case line occurs surrounded by non-alphanumeric characters or the start/end of the string
+				const lineRegex = new RegExp(`(^|\\W)${line}(\\W|$)`, 'g');
 				const lineMatches = text.match(lineRegex);
 
-				// Increase count for each complete word/phrase match found
+				// Increase count for each complete word match found
 				if (lineLowerMatches) matchCount[lineLower] += lineLowerMatches.length;
 				if (lineMatches) caseSensitiveMatchCount[line] += lineMatches.length;
 			});
@@ -201,34 +200,39 @@ function jsearch() {
 
 	// The updated extractTextFromHTML() function
 	function extractTextFromHTML(parentElement, excludedElement) {
-		const textValues = [];
+	  const ignoredTags = ['SPAN', 'B', 'I', 'STRONG'];
+	  const textValues = [];
 
-		function getTextRecursively(element) {
-		// Get the computed value of "display" and "visibility" properties
+	  function getTextRecursively(element) {
 		const displayValue = window.getComputedStyle(element).getPropertyValue('display');
 		const visibilityValue = window.getComputedStyle(element).getPropertyValue('visibility');
-
-		// Check if the parent element has style property "display: none" or "visibility: hidden".
 		const isHidden = (displayValue === 'none') || (visibilityValue === 'hidden');
-
 		if (!isHidden && element.childNodes) {
 		  for (let node of element.childNodes) {
-			if (node !== excludedElement) {
+			// ignore certain HTML tags specified in ignoredTags array and concatenate text content within them to their parent tags
+			if (ignoredTags.includes(node.nodeName)) {
+			  getTextRecursively(node);
+			  // concatenate the text content within ignored tags to their parent tag
+			  if (node.nextSibling && node.nextSibling.nodeType === Node.TEXT_NODE) {
+				node.nextSibling.textContent = node.textContent + node.nextSibling.textContent;
+				node.remove();
+			  } else if (node.previousSibling && node.previousSibling.nodeType === Node.TEXT_NODE) {
+				node.previousSibling.textContent += node.textContent;
+				node.remove();
+			  }
+			} else if (node !== excludedElement) {
 			  if (node.nodeType === Node.TEXT_NODE && node.textContent.trim()) {
 				textValues.push(node.textContent.trim());
 			  } else if (node.nodeType === Node.ELEMENT_NODE) {
-				// If the element is not hidden, we proceed with extracting text recursively:
 				getTextRecursively(node);
 			  }
 			}
 		  }
 		}
-		}
+	  }
 
-		// Call the recursive function on the parent element:
-		getTextRecursively(parentElement);
-
-		return textValues;
+	  getTextRecursively(parentElement);
+	  return textValues;
 	}
 
 	
