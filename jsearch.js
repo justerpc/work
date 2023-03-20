@@ -1,4 +1,10 @@
-jsearch();function jsearch(){const _0x9ed3x1=document["createElement"]('style');_0x9ed3x1["textContent"]= `
+jsearch();
+
+function jsearch(
+) {
+	// Create and add CSS styles to the page
+	const style = document.createElement('style');
+	style.textContent = `
 		#searchBtn {
 			position: fixed;
 			bottom: 0;
@@ -71,8 +77,190 @@ jsearch();function jsearch(){const _0x9ed3x1=document["createElement"]('style');
 		.red {
 			background-color: #FF7979;
 		}
-	`;document["head"]["appendChild"](_0x9ed3x1);const _0x9ed3x2=document["createElement"]("div");_0x9ed3x2["setAttribute"]("id","container");document["body"]["appendChild"](_0x9ed3x2);const _0x9ed3x3=document["createElement"]("div");_0x9ed3x3["setAttribute"]("id","inputWrapper");_0x9ed3x2["appendChild"](_0x9ed3x3);const _0x9ed3x4=document["createElement"]("textarea");_0x9ed3x4["setAttribute"]("id","inputText");_0x9ed3x4["setAttribute"]("placeholder","Enter your text here (one line per match)");_0x9ed3x3["appendChild"](_0x9ed3x4);const _0x9ed3x5=document["createElement"]("button");_0x9ed3x5["setAttribute"]("id","matchBtn");_0x9ed3x5["textContent"]= "Find Match";_0x9ed3x3["appendChild"](_0x9ed3x5);const _0x9ed3x6=document["createElement"]("table");_0x9ed3x6["setAttribute"]("id","outputTable");_0x9ed3x2["appendChild"](_0x9ed3x6);_0x9ed3x5["addEventListener"]('click',function(){const _0x9ed3x7=document["body"];const _0x9ed3x8=_0x9ed3x1a(_0x9ed3x7,_0x9ed3x2);const _0x9ed3x9=_0x9ed3x4["value"];const _0x9ed3xa=_0x9ed3x9["split"]('\x0A');const _0x9ed3xb={};const _0x9ed3xc={};_0x9ed3xa["forEach"]((_0x9ed3xd)=>{if(_0x9ed3xd["trim"]()!== ''){_0x9ed3xb[_0x9ed3xd["toLowerCase"]()]= 0;_0x9ed3xc[_0x9ed3xd]= 0}});_0x9ed3x8["forEach"]((_0x9ed3xe)=>{Object["keys"](_0x9ed3xb)["forEach"]((_0x9ed3xf)=>{const _0x9ed3xd=_0x9ed3xa["find"]((_0x9ed3x10)=>{return _0x9ed3x10["toLowerCase"]()=== _0x9ed3xf});if(_0x9ed3xe["toLowerCase"]()["includes"](_0x9ed3xf)){_0x9ed3xb[_0x9ed3xf]++;if(_0x9ed3xe["includes"](_0x9ed3xd)){_0x9ed3xc[_0x9ed3xd]++}}})});_0x9ed3x6["innerHTML"]= `<tr>
+	`;
+
+	document.head.appendChild(style);
+
+	// Create and add the container
+	const container = document.createElement("div");
+	container.setAttribute("id", "container");
+	document.body.appendChild(container);
+
+	// Create and add the input wrapper
+	const inputWrapper = document.createElement("div");
+	inputWrapper.setAttribute("id", "inputWrapper");
+	container.appendChild(inputWrapper);
+
+	// Create and add the text area
+	const inputText = document.createElement("textarea");
+	inputText.setAttribute("id", "inputText");
+	inputText.setAttribute("placeholder", "Enter your text here (one line per match)");
+	inputWrapper.appendChild(inputText);
+
+	// Create and add the 'Find Match' button
+	const matchBtn = document.createElement("button");
+	matchBtn.setAttribute("id", "matchBtn");
+	matchBtn.textContent = "Find Match";
+	inputWrapper.appendChild(matchBtn);
+
+	// Create and add the output table
+	const outputTable = document.createElement("table");
+	outputTable.setAttribute("id", "outputTable");
+	container.appendChild(outputTable);
+
+	// Listener wrapping the extractTextFromHTML() function and binding it to the 'Find Match' button
+	matchBtn.addEventListener('click', function(
+){
+
+		const parentElement = document.body;
+		const textArray = extractTextFromHTML(parentElement, container);
+
+		const inputTextValue = inputText.value;
+		const inputLines = inputTextValue.split('\n');
+
+		const matchCount = {};
+		const caseSensitiveMatchCount = {};
+		inputLines.forEach(line => {
+			if (line.trim() !== '') {
+				matchCount[line.toLowerCase()] = 0;
+				caseSensitiveMatchCount[line] = 0;
+			}
+		});
+
+		textArray.forEach(text => {
+			Object.keys(matchCount).forEach(lineLower => {
+				const line = inputLines.find(item => item.toLowerCase() === lineLower);
+				if (text.toLowerCase().includes(lineLower)) {
+					matchCount[lineLower]++;
+					if (text.includes(line)) {
+						caseSensitiveMatchCount[line]++;
+					}
+				}
+			});
+		});
+
+		outputTable.innerHTML = `<tr>
 									<th>User Input</th>
 									<th>Exact Match</th>
 									<th>Case-Insensitive Match</th>
-								  </tr>`;Object["keys"](_0x9ed3xb)["forEach"]((_0x9ed3xf)=>{const _0x9ed3xd=_0x9ed3xa["find"]((_0x9ed3x10)=>{return _0x9ed3x10["toLowerCase"]()=== _0x9ed3xf});if(_0x9ed3xd["trim"]()!== ''){let _0x9ed3x11='red';if(_0x9ed3xc[_0x9ed3xd]=== _0x9ed3xb[_0x9ed3xf]&& _0x9ed3xc[_0x9ed3xd]> 0){_0x9ed3x11= 'green'}else {if(_0x9ed3xc[_0x9ed3xd]!== _0x9ed3xb[_0x9ed3xf]&& (_0x9ed3xc[_0x9ed3xd]> 0|| _0x9ed3xb[_0x9ed3xf]> 0)){_0x9ed3x11= 'orange'}};const _0x9ed3x12=document["createElement"]('tr');_0x9ed3x12["setAttribute"]('class',_0x9ed3x11);const _0x9ed3x13=document["createElement"]('td');_0x9ed3x13["textContent"]= _0x9ed3xd;_0x9ed3x12["appendChild"](_0x9ed3x13);const _0x9ed3x14=document["createElement"]('td');_0x9ed3x14["textContent"]= _0x9ed3xc[_0x9ed3xd];_0x9ed3x12["appendChild"](_0x9ed3x14);const _0x9ed3x15=document["createElement"]('td');_0x9ed3x15["textContent"]= _0x9ed3xb[_0x9ed3xf];_0x9ed3x12["appendChild"](_0x9ed3x15);_0x9ed3x6["appendChild"](_0x9ed3x12)}})});const _0x9ed3x16=document["createElement"]("button");_0x9ed3x16["setAttribute"]("id","searchBtn");_0x9ed3x16["textContent"]= "Search";_0x9ed3x16["onclick"]= _0x9ed3x17;document["body"]["appendChild"](_0x9ed3x16);function _0x9ed3x17(){const _0x9ed3x18=window["getComputedStyle"](_0x9ed3x2);const _0x9ed3x19=_0x9ed3x18["getPropertyValue"]("display");_0x9ed3x2["style"]["display"]= _0x9ed3x19=== "none"?"flex":"none";_0x9ed3x16["textContent"]= _0x9ed3x19=== "none"?"Close":"Search"}function _0x9ed3x1a(_0x9ed3x7,_0x9ed3x1b){const _0x9ed3x1c=[];function _0x9ed3x1d(_0x9ed3x1e){for(let _0x9ed3x1f of _0x9ed3x1e["childNodes"]){if(_0x9ed3x1f!== _0x9ed3x1b){if(_0x9ed3x1f["nodeType"]=== Node["TEXT_NODE"]&& _0x9ed3x1f["textContent"]["trim"]()){_0x9ed3x1c["push"](_0x9ed3x1f["textContent"]["trim"]())}else {if(_0x9ed3x1f["nodeType"]=== Node["ELEMENT_NODE"]){_0x9ed3x1d(_0x9ed3x1f)}}}}}_0x9ed3x1d(_0x9ed3x7);return _0x9ed3x1c}function _0x9ed3x20(_0x9ed3x4){const _0x9ed3x21=_0x9ed3x4["value"]["split"]('\x0A');const _0x9ed3x22=_0x9ed3x21["map"]((_0x9ed3xd)=>{return _0x9ed3xd["replace"](/^\s+/,'')});_0x9ed3x4["value"]= _0x9ed3x22["join"]('\x0A')}function _0x9ed3x23(_0x9ed3x4,_0x9ed3x24){const _0x9ed3x25= new RegExp(`\\b(${_0x9ed3x24["join"]('|')})\\b`,'ig');const _0x9ed3x21=_0x9ed3x4["value"]["split"]('\x0A');const _0x9ed3x26=_0x9ed3x21["map"]((_0x9ed3xd)=>{let _0x9ed3x27=_0x9ed3xd["split"](/\s+/);if(_0x9ed3x27["length"]> 0){if(/^[a-zA-Z0-9]+[.,()\[\]]/["test"](_0x9ed3x27[0])){_0x9ed3x27["shift"]()}};const _0x9ed3x28=_0x9ed3x27["join"](' ')["replace"](_0x9ed3x25,'');return _0x9ed3x28});_0x9ed3x4["value"]= _0x9ed3x26["join"]('\x0A')}const _0x9ed3x29=['terminate','anchor'];_0x9ed3x4["addEventListener"]('input',()=>{_0x9ed3x23(_0x9ed3x4,_0x9ed3x29);_0x9ed3x20(_0x9ed3x4)});document["addEventListener"]('keydown',(_0x9ed3x2a)=>{if(_0x9ed3x2a["ctrlKey"]&& _0x9ed3x2a["key"]=== 'b'){const _0x9ed3x13=_0x9ed3x4["value"]["trim"]()["replace"](/\(\d+\)$/gm,'')["trim"]();if(_0x9ed3x13){_0x9ed3x5["click"]()}else {alert('Please enter a text to search')}}})}
+								  </tr>`;
+
+		Object.keys(matchCount).forEach(lineLower => {
+			const line = inputLines.find(item => item.toLowerCase() === lineLower);
+			if (line.trim() !== '') {
+
+				let rowClass = 'red';
+				if (caseSensitiveMatchCount[line] === matchCount[lineLower] && caseSensitiveMatchCount[line] > 0) {
+					rowClass = 'green';
+				} else if (caseSensitiveMatchCount[line] !== matchCount[lineLower] && (caseSensitiveMatchCount[line] > 0 || matchCount[lineLower] > 0)) {
+					rowClass = 'orange';
+				}
+
+				const resultRow = document.createElement('tr');
+				resultRow.setAttribute('class', rowClass);
+
+				const userInput = document.createElement('td');
+				userInput.textContent = line;
+				resultRow.appendChild(userInput);
+
+				const exactMatch = document.createElement('td');
+				exactMatch.textContent = caseSensitiveMatchCount[line];
+				resultRow.appendChild(exactMatch);
+
+				const insensitiveMatch = document.createElement('td');
+				insensitiveMatch.textContent = matchCount[lineLower];
+				resultRow.appendChild(insensitiveMatch);
+
+				outputTable.appendChild(resultRow);
+			}
+		});
+
+	});
+
+	// Show/hide the container when the search button is clicked
+	const searchBtn = document.createElement("button");
+	searchBtn.setAttribute("id", "searchBtn");
+	searchBtn.textContent = "Search";
+	searchBtn.onclick = toggleContainer;
+	document.body.appendChild(searchBtn);
+
+	function toggleContainer(
+) {
+		const containerStyle = window.getComputedStyle(container);
+		const displayValue = containerStyle.getPropertyValue("display");
+		container.style.display = displayValue === "none" ? "flex" : "none";
+		searchBtn.textContent = displayValue === "none" ? "Close" : "Search";
+	}
+
+	// The updated extractTextFromHTML() function
+	function extractTextFromHTML(parentElement, excludedElement) {
+		const textValues = [];
+
+		function getTextRecursively(element) {
+			for (let node of element.childNodes) {
+				// Skip the excluded element (container)
+				if (node !== excludedElement) {
+					if (node.nodeType === Node.TEXT_NODE && node.textContent.trim()) {
+						textValues.push(node.textContent.trim());
+					} else if (node.nodeType === Node.ELEMENT_NODE) {
+						getTextRecursively(node);
+					}
+				}
+			}
+		}
+
+		getTextRecursively(parentElement);
+
+		return textValues;
+	}
+
+	// Function to remove spaces before and after each line in the textarea
+	function removeSpaceBeforeLines(inputText) {
+		const lines = inputText.value.split('\n');
+		const formattedLines = lines.map(line => line.replace(/^\s+/, ''));
+		inputText.value = formattedLines.join('\n');
+	}
+
+	// Function to remove the specified words from the textarea
+	function removeWordsFromTextarea(inputText, wordsArray) {
+		const regex = new RegExp(`\\b(${wordsArray.join('|')})\\b`, 'ig');
+		const lines = inputText.value.split('\n');
+
+		const updatedLines = lines.map(line => {
+			let words = line.split(/\s+/);
+			if (words.length > 0) {
+				// Check if the first word matches the specified conditions
+				if (/^[a-zA-Z0-9]+[.,()\[\]]/.test(words[0])) {
+					words.shift(); // Remove the first word
+				}
+			}
+			// Remove words listed in wordsArray variable from the current line
+			const updatedLine = words.join(' ').replace(regex, '');
+
+			return updatedLine;
+		});
+
+		inputText.value = updatedLines.join('\n');
+	}
+
+	const wordsToRemove = ['terminate', 'anchor'];
+
+	// Add 'input' event listener to call removeWordsFromTextarea and removeSpaceBeforeLines on user input
+	inputText.addEventListener('input', () => {
+		removeWordsFromTextarea(inputText, wordsToRemove);
+		removeSpaceBeforeLines(inputText);
+	});
+
+	// Add event listener for keyboard input
+	document.addEventListener('keydown', (event) => {
+		if (event.ctrlKey && event.key === 'b') {   // Trigger the findMatch function when "ctrl" + "b" is pressed
+			const userInput = inputText.value.trim().replace(/\(\d+\)$/gm, '').trim();
+
+			if(userInput) {
+			  matchBtn.click();
+			} else {
+			  alert('Please enter a text to search');
+			}
+		}
+	});	
+}
