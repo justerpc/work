@@ -127,12 +127,21 @@ function jsearch() {
 		});
 
 		textArray.forEach(text => {
-			Object.keys(matchCount).forEach(lineLower => {
-				const line = inputLines.find(item => item.toLowerCase() === lineLower);
-				if (text.toLowerCase().includes(lineLower)) {
-					matchCount[lineLower]++;
-					if (text.includes(line)) {
-						caseSensitiveMatchCount[line]++;
+			const words = text.toLowerCase().split(/\W+/);
+			inputLines.forEach(line => {
+				if (line.trim() !== '') {
+					let matchFound = false;
+					words.forEach(word => {
+						if (word === line.toLowerCase()) {
+							matchFound = true;
+						}
+					});
+
+					if (matchFound) {
+						matchCount[line.toLowerCase()]++;
+						if (text.includes(line)) {
+							caseSensitiveMatchCount[line]++;
+						}
 					}
 				}
 			});
