@@ -126,22 +126,23 @@ function jsearch() {
 			}
 		});
 
-		// Regex to match start/end of string or a non-alphanumeric character
-		const wordBoundary = /(^|\W)$1(\W|$)/;
-
+		// Updating the regular expressions to allow for matching of phrases
 		textArray.forEach(text => {
 			Object.keys(matchCount).forEach(lineLower => {
 				const line = inputLines.find(item => item.toLowerCase() === lineLower);
 
-				// Check if the lowercase line occurs surrounded by non-alphanumeric characters or the start/end of the string
-				const lineLowerRegex = new RegExp(`(^|\\W)${lineLower}(\\W|$)`, 'gi');
+				const escapedLineLower = lineLower.replace(/[.*+\-?^${}()|[\]\\]/g, '\\$&');
+				const escapedLine = line.replace(/[.*+\-?^${}()|[\]\\]/g, '\\$&');
+
+				// Check if the lowercase line occurs either surrounded by non-alphanumeric characters or at the start/end of the string
+				const lineLowerRegex = new RegExp(`(^|\\W)${escapedLineLower}(\\W|$)`, 'gi');
 				const lineLowerMatches = text.toLowerCase().match(lineLowerRegex);
 
-				// Check if the original case line occurs surrounded by non-alphanumeric characters or the start/end of the string
-				const lineRegex = new RegExp(`(^|\\W)${line}(\\W|$)`, 'g');
+				// Check if the original case line occurs either surrounded by non-alphanumeric characters or at the start/end of the string
+				const lineRegex = new RegExp(`(^|\\W)${escapedLine}(\\W|$)`, 'g');
 				const lineMatches = text.match(lineRegex);
 
-				// Increase count for each complete word match found
+				// Increase count for each complete word/phrase match found
 				if (lineLowerMatches) matchCount[lineLower] += lineLowerMatches.length;
 				if (lineMatches) caseSensitiveMatchCount[line] += lineMatches.length;
 			});
