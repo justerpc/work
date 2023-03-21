@@ -1,7 +1,6 @@
 jsearch();
 
-function jsearch(
-) {
+function jsearch() {
 	// Create and add CSS styles to the page
 	const style = document.createElement('style');
 	style.textContent = `
@@ -109,8 +108,7 @@ function jsearch(
 	container.appendChild(outputTable);
 
 	// Listener wrapping the extractTextFromHTML() function and binding it to the 'Find Match' button
-	matchBtn.addEventListener('click', function(
-){
+	matchBtn.addEventListener('click', function(){
 		trimLines(inputText);
 
 		const parentElement = document.body;
@@ -194,8 +192,7 @@ function jsearch(
 	searchBtn.onclick = toggleContainer;
 	document.body.appendChild(searchBtn);
 
-	function toggleContainer(
-) {
+	function toggleContainer() {
 		const containerStyle = window.getComputedStyle(container);
 		const displayValue = containerStyle.getPropertyValue("display");
 		container.style.display = displayValue === "none" ? "flex" : "none";
@@ -207,25 +204,25 @@ function jsearch(
 		const textValues = [];
 
 		function getTextRecursively(element) {
-		// Get the computed value of "display" and "visibility" properties
-		const displayValue = window.getComputedStyle(element).getPropertyValue('display');
-		const visibilityValue = window.getComputedStyle(element).getPropertyValue('visibility');
+			// Get the computed value of "display" and "visibility" properties
+			const displayValue = window.getComputedStyle(element).getPropertyValue('display');
+			const visibilityValue = window.getComputedStyle(element).getPropertyValue('visibility');
 
-		// Check if the parent element has style property "display: none" or "visibility: hidden".
-		const isHidden = (displayValue === 'none') || (visibilityValue === 'hidden');
+			// Check if the parent element has style property "display: none" or "visibility: hidden".
+			const isHidden = (displayValue === 'none') || (visibilityValue === 'hidden');
 
-		if (!isHidden && element.childNodes) {
-		  for (let node of element.childNodes) {
-			if (node !== excludedElement) {
-			  if (node.nodeType === Node.TEXT_NODE && node.textContent.trim()) {
-				textValues.push(node.textContent.trim());
-			  } else if (node.nodeType === Node.ELEMENT_NODE) {
-				// If the element is not hidden, we proceed with extracting text recursively:
-				getTextRecursively(node);
+			if (!isHidden && element.childNodes) {
+			  for (let node of element.childNodes) {
+				if (node !== excludedElement) {
+				  if (node.nodeType === Node.TEXT_NODE && node.innerText.trim()) {
+					textValues.push(node.innerText.trim());
+				  } else if (node.nodeType === Node.ELEMENT_NODE) {
+					// If the element is not hidden, we proceed with extracting text recursively:
+					getTextRecursively(node);
+				  }
+				}
 			  }
 			}
-		  }
-		}
 		}
 
 		// Call the recursive function on the parent element:
