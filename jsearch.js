@@ -112,7 +112,8 @@ function jsearch() {
 		trimLines(inputText);
 
 		const parentElement = document.body;
-		const textArray = extractTextFromHTML(parentElement, container);
+		//const textArray = extractTextFromHTML(parentElement, container);
+		const textArray = extractText();
 
 		const inputTextValue = inputText.value;
 		const inputLines = inputTextValue.split('\n');
@@ -229,6 +230,38 @@ function jsearch() {
 		getTextRecursively(parentElement);
 
 		return textValues;
+	}
+	
+	// Function to extract text and store them in an array
+    function extractText() {
+	  function getLeafNodes(node, leafNodes) {
+		// Get the computed style of the node element
+		const nodeStyle = window.getComputedStyle(node);
+
+		// Check if the CSS properties belong to visible elements
+		const isVisible = nodeStyle.getPropertyValue('display') !== 'none' &&
+						  nodeStyle.getPropertyValue('visibility') !== 'hidden';
+
+		// Verify if the element is a leaf node and is visible
+		if (isVisible && (!node.hasChildNodes() || (node.children.length === 0 && node.innerText))) {
+		  leafNodes.push(node);
+		} else {
+		  for (const child of node.children) {
+			getLeafNodes(child, leafNodes);
+		  }
+		}
+	  }
+
+	  let leafNodes = [];
+	  getLeafNodes(document.body, leafNodes);
+
+	  // Extract text from leaf nodes
+	  let extractedTexts = leafNodes.map(leaf => {
+		const innerText = leaf.innerText;
+		return innerText ? innerText.trim() : '';
+	  });
+
+	  return extractedTexts; // return only the extracted texts
 	}
 
 	
