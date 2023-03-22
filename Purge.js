@@ -94,7 +94,7 @@ class Purge {
 
 				// Loop through each line and remove the first word if enclosed in brackets
 				for(let i = 0; i < lines.length; i++) {
-					if(/^[({\[\]})]/.test(lines[i][0])) {
+					if(/^[({[\]})<>]/.test(lines[i][0])) {
 						lines[i].splice(0, 1);
 					}
 				}
