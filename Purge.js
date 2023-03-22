@@ -109,7 +109,10 @@ class Purge {
 				// Loop through each line and remove the specified words
 				for(let i = 0; i < lines.length; i++) {
 					// Remove multiple consecutive underscores with a regular expression
-    					lines[i] = lines[i].replace(/_+/g, '');
+    					for(let j = 0; j < lines[i].length; j++) {
+					      // Convert the current element to a string and remove multiple consecutive underscores with a regular expression
+					      lines[i][j] = lines[i][j].toString().replace(/_+/g, '');
+					    }
 					
 					for(let j = 0; j < wordsToRemove.length; j++) {
 					  const word = wordsToRemove[j];
