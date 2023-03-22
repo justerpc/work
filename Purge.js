@@ -61,7 +61,7 @@ class Purge {
 		// Check if the target textarea exists
 		if(this.isAssigned) {
 			// Define the words to remove
-			let wordsToRemove = ['terminate', 'term', 'anchor', 'shuffle', 'exclusive'];
+			let wordsToRemove = ['terminate', 'term', 'anchor', 'shuffle', 'exclusive', 'fixed'];
 
 			let timeoutID = null;
 
