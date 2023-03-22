@@ -86,21 +86,21 @@ class Purge {
 				// Loop through each line and remove bullet/number lists labels from the start of the line
 				for(let i = 0; i < lines.length; i++) {
 					if(/\d+\./.test(lines[i][0]) || /[*\-+]/.test(lines[i][0])) {
-					  lines[i].splice(0, 1);
+						lines[i].splice(0, 1);
 					}
 				}
 
 				// Loop through each line again and remove the first word if enclosed in brackets
 				for(let i = 0; i < lines.length; i++) {
 					if(/^[({\[\]})]/.test(lines[i][0])) {
-					  lines[i].splice(0, 1);
+						lines[i].splice(0, 1);
 					}
 				}
 
 				// Loop through each line and remove the last word if enclosed in curly brackets, angled brackets or square brackets
 				for(let i = 0; i < lines.length; i++) {
 					let lastWord = lines[i][lines[i].length - 1];
-					
+
 					if(/^[\[\]<>{].*[\}\]>]$/.test(lastWord)) {
 						lines[i].splice(lines[i].length - 1, 1);
 					}
@@ -108,26 +108,25 @@ class Purge {
 
 				// Loop through each line and remove the specified words
 				for(let i = 0; i < lines.length; i++) {
-					// Remove multiple consecutive underscores with a regular expression
-    					for(let j = 0; j < lines[i].length; j++) {
-					      // Convert the current element to a string and remove multiple consecutive underscores with a regular expression
-					      lines[i][j] = lines[i][j].toString().replace(/_+/g, '');
-					    }
-					
 					for(let j = 0; j < wordsToRemove.length; j++) {
-					  const word = wordsToRemove[j];
+						const word = wordsToRemove[j];
 
-					  // match the exact word case-insensitively
-					  const regex = new RegExp('\\b' + word + '\\b', 'i');
+						// match the exact word case-insensitively
+						const regex = new RegExp('\\b' + word + '\\b', 'i');
 
-					  // Use Array.prototype.indexOf() to find the index of the exact word instead of string.search() to correctly handle special characters
-					  const index = lines[i].findIndex((element) => regex.test(element));
+						// Use Array.prototype.indexOf() to find the index of the exact word instead of string.search() to correctly handle special characters
+						const index = lines[i].findIndex((element) => regex.test(element));
 
-					  if(index >= 0) {
-						// If the word is found, remove it from the line
-						lines[i].splice(index, 1);
-					  }
+						if(index >= 0) {
+							// If the word is found, remove it from the line
+							lines[i].splice(index, 1);
+						}
 					}
+				}
+
+				// Loop through each line and remove consecutive underscores forming a line
+				for(let i = 0; i < lines.length; i++) {
+					lines[i] = lines[i].map(word => word.replace(/_{2,}/g, ''));
 				}
 
 				// Loop through each line and join the array elements back into a single string
