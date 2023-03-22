@@ -80,10 +80,11 @@ class Purge {
 				// Get the current value of the textarea and split it into an array of lines
 				let lines = that.textarea.value.split('\n');
 
-				// Loop through each line and split it into an array of words
+				// Loop through each line and split it into an array of words using whitespace as delimiter
 				for(let i = 0; i < lines.length; i++) {
-					lines[i] = lines[i].split(' ');
+					lines[i] = lines[i].split(/\s+/);
 				}
+
 
 				// Loop through each line and remove bullet/number lists labels from the start of the line
 				for(let i = 0; i < lines.length; i++) {
@@ -94,7 +95,7 @@ class Purge {
 
 				// Loop through each line and remove the first word if enclosed in brackets
 				for(let i = 0; i < lines.length; i++) {
-					if(/^[({[\]})<>]/.test(lines[i][0])) {
+					if(/^[({\[\]})]/.test(lines[i][0]) || /^[\[\]<>{].*[\}\]>]$/.test(lines[i][0])) {
 						lines[i].splice(0, 1);
 					}
 				}
