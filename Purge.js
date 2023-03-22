@@ -1,3 +1,5 @@
+/* * * V E R S I O N   3 * * */
+
 document.querySelector('body').addEventListener('keydown', function(event) {
 	if(event.target.tagName.toLowerCase() === 'textarea' && purge.isAssigned) {
 		purge.purgeTextArea();
@@ -90,7 +92,7 @@ class Purge {
 					}
 				}
 
-				// Loop through each line again and remove the first word if enclosed in brackets
+				// Loop through each line and remove the first word if enclosed in brackets
 				for(let i = 0; i < lines.length; i++) {
 					if(/^[({\[\]})]/.test(lines[i][0])) {
 						lines[i].splice(0, 1);
@@ -129,6 +131,14 @@ class Purge {
 					lines[i] = lines[i].map(word => word.replace(/_{2,}/g, ''));
 				}
 
+				// Loop through each line and remove "pair together with" or "group together with" and the next word after it
+				for(let i = 0; i < lines.length; i++) {
+					let line = lines[i].join(" ");
+					line = line.replace(/pair together with\s*\S+/gi, "");
+					line = line.replace(/group together with\s*\S+/gi, "");
+					lines[i] = line.split(" ");
+				}
+
 				// Loop through each line and join the array elements back into a single string
 				for(let i = 0; i < lines.length; i++) {
 					lines[i] = lines[i].join(' ');
@@ -138,7 +148,6 @@ class Purge {
 				const processedText = lines.join('\n');
 
 				// Replace any double spaces with single spaces
-				//const cleanedText = processedText.replace(/ {2,}/g, ' ');
 				const cleanedText = processedText.replace(/[\t ]{2,}/g, ' ');
 
 				// Set the updated text as the new value of the textarea
