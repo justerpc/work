@@ -89,6 +89,7 @@ class Purge {
 				for(let i = 0; i < lines.length; i++) {
 					const isNonAlphabetic = /^[^a-zA-Z]*$/.test(lines[i][0]);
 					const isSingleAlphabet = /^[a-zA-Z]{1}$/.test(lines[i][0]) && !/^i$/i.test(lines[i][0]);
+					const isSingleAlphabet = /^[a-zA-Z]$/.test(lines[i][0]) && !/^i$/i.test(lines[i][0]) && /^[.,<>{}\[\]\(\)]*$/.test(lines[i][0]);
 					const isBracketsNumeric = /^[\d<>\[\]{}()]+$/.test(lines[i][0]);
 
 					// Remove the first word if any of the conditions are true
