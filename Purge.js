@@ -1,4 +1,4 @@
-/* * * V E R S I O N   4 * * */
+/* * *   V E R S I O N   4 . 1   * * */
 
 document.querySelector('body').addEventListener('keydown', function(event) {
 	if(event.target.tagName.toLowerCase() === 'textarea' && purge.isAssigned) {
@@ -12,6 +12,8 @@ document.querySelector('body').addEventListener('keydown', function(event) {
 
 class Purge {
 	constructor() {
+		let that = this;
+		
 		// Create and add CSS styles to the page
 		this.purgeStyle = document.createElement('style');
 		this.projName = "Purge";
@@ -29,29 +31,27 @@ class Purge {
 		
 		document.head.appendChild(this.purgeStyle);
 		
-		// Add Strip button to the web page
+		// Add Purge button to the web page
 		this.purgeBtn = document.createElement("button");
 		this.purgeBtn.setAttribute("id", "purgeBtn");
 		this.purgeBtn.textContent = this.projName + " Enabled";
 		document.body.appendChild(this.purgeBtn);
+		
+		// Add onclick listener to the textarea
+		this.purgeBtn.onclick = togglePurgeBtn;
+		
+		function togglePurgeBtn() {
+			let purgeStatus = that.purgeBtn.textContent;
+			that.purgeBtn.textContent = ((purgeStatus === "Purge Disabled") ? "Purge Enabled" : "Purge Disabled");
+		}
 	}
 	
 	assignTextArea() {
-		let that = this;
-		
 		// Get the textarea element
 		this.textarea = document.getElementById('pastetxt');
 		
 		if(this.textarea) {
 			this.isAssigned = true;
-			
-			// Add onclick listener to the textarea
-			this.purgeBtn.onclick = toggleStripBtn;
-			
-			function toggleStripBtn() {
-				let purgeStatus = that.purgeBtn.textContent;
-				that.purgeBtn.textContent = ((purgeStatus === "Purge Disabled") ? "Purge Enabled" : "Purge Disabled");
-			}
 		}
 	}
 	
