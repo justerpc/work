@@ -93,12 +93,13 @@ class Purge {
 					}
 				}
 
-				// Loop through each line and remove the first word if enclosed in brackets
+				// Loop through each line and remove the first word if enclosed in brackets or if it's a numeric-only string
 				for(let i = 0; i < lines.length; i++) {
-					if(/^[({\[\]})]/.test(lines[i][0]) || /^[\[\]<>{].*[\}\]>]$/.test(lines[i][0])) {
-						lines[i].splice(0, 1);
-					}
+				  if(/^[({\[\]})<>]/.test(lines[i][0]) || /^\d+$/.test(lines[i][0])) { // Updated the regular expression to check if first word is enclosed in brackets or if it's a numeric-only string
+				    lines[i].splice(0, 1);
+				  }
 				}
+
 
 				// Loop through each line and remove the last word if enclosed in curly brackets, angled brackets or square brackets
 				for(let i = 0; i < lines.length; i++) {
