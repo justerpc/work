@@ -87,18 +87,11 @@ class Purge {
 
 				// Loop through each line and remove the first word if it's numeric only or non-alphanumeric only, or a combination of numeric and non-alphanumeric characters that begins with a non-alphabetic character
 				for (let i = 0; i < lines.length; i++) {
-				  // check if the first word consists of only numeric characters
-				  if (/^\d+$/.test(lines[i][0])) {
-				    lines[i].splice(0, 1);
-				  } 
-				  // check if the first word consists of only non-alphanumeric characters
-				  else if (/^[^\w]+$/.test(lines[i][0])) {
-				    lines[i].splice(0, 1);
-				  }
-				  // check if the first word consists of a combination of numeric and non-alphanumeric characters, and begins with a non-alphabetic character
-				  else if (/^[^a-zA-Z][\d^\w]+$/.test(lines[i][0])) {
-				    lines[i].splice(0, 1);
-				  }
+				  
+					if (/^[^a-zA-Z]*$/.test(lines[i][0]) || (/^[a-zA-Z]{1}$/.test(lines[i][0]) && !/^i$/i.test(lines[i][0]))) {
+						lines[i].splice(0, 1);
+					} 
+					
 				}
 
 				// Loop through each line and remove the last word if enclosed in curly brackets, angled brackets or square brackets
