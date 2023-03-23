@@ -180,7 +180,7 @@ class Canvas {
 				right: 0;
 				background-color: #f2f2f2;
 				padding: 20px;
-				max-height: 70vh;
+				max-height: 40vh;
 				overflow-y: auto;
 				z-index: 9999;
 				font-family: Arial, Helvetica, sans-serif;
@@ -193,8 +193,6 @@ class Canvas {
 			}
 			
 			#inputText {
-				height: 15em;
-				min-height: 15em;
 				width: 100%;
 				margin: 10px 0;
 				padding: 5px;
@@ -235,6 +233,7 @@ class Canvas {
 		// Create and add the text area
 		this.inputText = document.createElement("textarea");
 		this.inputText.setAttribute("id", "pastetxt");
+		this.inputText.setAttribute("rows", "10em");
 		this.inputText.setAttribute("placeholder", "Enter your text here (one line per match)");
 		this.inputWrapper.appendChild(this.inputText);
 	}
