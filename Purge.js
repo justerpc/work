@@ -1,4 +1,4 @@
-/* * * V E R S I O N   3 * * */
+/* * * V E R S I O N   4 * * */
 
 document.querySelector('body').addEventListener('keydown', function(event) {
 	if(event.target.tagName.toLowerCase() === 'textarea' && purge.isAssigned) {
@@ -85,12 +85,8 @@ class Purge {
 					lines[i] = lines[i].split(/\s+/);
 				}
 
-				// Loop through each line and remove the first word if it's numeric only or non-alphanumeric only, or a combination of numeric and non-alphanumeric characters that begins with a non-alphabetic character
-				for (let i = 0; i < lines.length; i++) {
-				  
-					
-					
-					// Test if the first word doesn't contain alphabetic characters or is a non-'I' and non-'i' single alphabetic character
+				// Loop through each line and remove the first word if it doesn't contain alphabetic characters or is a non-'I' and non-'i' single alphabetic character
+				for(let i = 0; i < lines.length; i++) {
 					const isNonAlphabetic = /^[^a-zA-Z]*$/.test(lines[i][0]);
 					const isSingleAlphabet = /^[a-zA-Z]{1}$/.test(lines[i][0]) && !/^i$/i.test(lines[i][0]);
 					const isBracketsNumeric = /^[\d<>\[\]{}()]+$/.test(lines[i][0]);
@@ -99,7 +95,6 @@ class Purge {
 					if (isNonAlphabetic || isSingleAlphabet || isBracketsNumeric) {
 						lines[i].splice(0, 1);
 					}
-					
 				}
 
 				// Loop through each line and remove the last word if enclosed in curly brackets, angled brackets or square brackets
