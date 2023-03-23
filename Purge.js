@@ -85,21 +85,21 @@ class Purge {
 					lines[i] = lines[i].split(/\s+/);
 				}
 
-
-				// Loop through each line and remove bullet/number lists labels from the start of the line
-				for(let i = 0; i < lines.length; i++) {
-					if(/\d+\./.test(lines[i][0]) || /[*\-+]/.test(lines[i][0])) {
-						lines[i].splice(0, 1);
-					}
-				}
-
-				// Loop through each line and remove the first word if enclosed in brackets or if it's a numeric-only string
-				for(let i = 0; i < lines.length; i++) {
-				  if(/^[({\[\]})<>]/.test(lines[i][0]) || /^\d+$/.test(lines[i][0])) { // Updated the regular expression to check if first word is enclosed in brackets or if it's a numeric-only string
+				// Loop through each line and remove the first word if it's numeric only or non-alphanumeric only, or a combination of numeric and non-alphanumeric characters that begins with a non-alphabetic character
+				for (let i = 0; i < lines.length; i++) {
+				  // check if the first word consists of only numeric characters
+				  if (/^\d+$/.test(lines[i][0])) {
+				    lines[i].splice(0, 1);
+				  } 
+				  // check if the first word consists of only non-alphanumeric characters
+				  else if (/^[^\w]+$/.test(lines[i][0])) {
+				    lines[i].splice(0, 1);
+				  }
+				  // check if the first word consists of a combination of numeric and non-alphanumeric characters, and begins with a non-alphabetic character
+				  else if (/^[^a-zA-Z][\d^\w]+$/.test(lines[i][0])) {
 				    lines[i].splice(0, 1);
 				  }
 				}
-
 
 				// Loop through each line and remove the last word if enclosed in curly brackets, angled brackets or square brackets
 				for(let i = 0; i < lines.length; i++) {
