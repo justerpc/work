@@ -88,9 +88,17 @@ class Purge {
 				// Loop through each line and remove the first word if it's numeric only or non-alphanumeric only, or a combination of numeric and non-alphanumeric characters that begins with a non-alphabetic character
 				for (let i = 0; i < lines.length; i++) {
 				  
-					if (/^[^a-zA-Z]*$/.test(lines[i][0]) || (/^[a-zA-Z]{1}$/.test(lines[i][0]) && !/^i$/i.test(lines[i][0]))) {
+					
+					
+					// Test if the first word doesn't contain alphabetic characters or is a non-'I' and non-'i' single alphabetic character
+					const isNonAlphabetic = /^[^a-zA-Z]*$/.test(lines[i][0]);
+					const isSingleAlphabet = /^[a-zA-Z]{1}$/.test(lines[i][0]) && !/^i$/i.test(lines[i][0]);
+					const isBracketsNumeric = /^[\d<>\[\]{}()]+$/.test(lines[i][0]);
+
+					// Remove the first word if any of the conditions are true
+					if (isNonAlphabetic || isSingleAlphabet || isBracketsNumeric) {
 						lines[i].splice(0, 1);
-					} 
+					}
 					
 				}
 
