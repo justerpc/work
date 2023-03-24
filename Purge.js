@@ -1,4 +1,4 @@
-/* * *   V E R S I O N   5   * * */
+/* * *   V E R S I O N   5 . 1   * * */
 
 document.querySelector("body").addEventListener("keydown", function(event) {
 	if(event.target.tagName.toLowerCase() === "textarea" && purge.isAssigned) {
@@ -79,11 +79,11 @@ class Purge {
 
 				// Loop through each line and split it into an array of words using whitespace as delimiter
 				for(let i = 0; i < lines.length; i++) {
+					lines[i] = removeConsecutiveUnderscores(lines[i]);
 					lines[i] = removeSpecifiedPhrases(lines[i]);
 					lines[i] = removeFirstWord(lines[i]);
 					lines[i] = removeLastWord(lines[i]);
 					lines[i] = removeSpecifiedWords(lines[i]);
-					lines[i] = removeConsecutiveUnderscores(lines[i]);
 					
 					// Join the array elements back into a single string
 					lines[i] = lines[i].join(" ");
@@ -100,17 +100,14 @@ class Purge {
 			}
 			
 			function removeSpecifiedPhrases(sentence) {
-
-// Define an array of strings to be removed
-let phrasesToRemove = [
-"pair together with",
-"group together with",
-"added in",
-"updated in",
-"ask for",
-"removed in"
-];
-
+				// Define an array of strings to be removed
+				let phrasesToRemove = [
+					"pair together with",
+					"group together with",
+					"added in",
+					"updated in",
+					"ask for"
+				];
 				
 				// Remove bracketed phrases
 				sentence = sentence.replace(/(<.*?>|{.*?}|\[.*?\])/g, "");
@@ -125,7 +122,7 @@ let phrasesToRemove = [
 			
 			function removeFirstWord(words) {	
 				let isNonAlphabetic = /^[^a-zA-Z]*$/.test(words[0]) && words[0].charAt(0) != "$";
-				let isSingleAlphabet = words[0].length < 3 && ((/^[a-zA-Z]{1}$/.test(words[0].charAt(0)) || /^[a-zA-Z]{1}$/.test(words[0].charAt(1))) && !/^i$/i.test(words)) && (/^[.,<>{}\[\]\(\)]{1}$/.test(words[0].charAt(0)) || /^[.,<>{}\[\]\(\)]{1}$/.test(words[0].charAt(1)));
+				let isSingleAlphabet = words[0].length < 3 && (/^[a-zA-Z]{1}$/.test(words[0].charAt(0)) || /^[a-zA-Z]{1}$/.test(words[0].charAt(1)) || /^[.,<>{}\[\]\(\)]{1}$/.test(words[0].charAt(0)) || /^[.,<>{}\[\]\(\)]{1}$/.test(words[0].charAt(1))) && !/^[ia]$/i.test(words[0]);
 				let isBracketsNumeric = /^[\d<>\[\]{}()]+$/.test(words[0]);
 
 				// Remove the first word if any of the conditions are true
@@ -176,9 +173,11 @@ let phrasesToRemove = [
 			}
 			
 			function removeConsecutiveUnderscores(words) {
-				words = words.map(word => word.replace(/_{2,}/g, ""));
-				
-				return words;
+				// Use regular expression to match consecutive underscores (at least two) with optional surrounding whitespace
+				let regex = /\s*_{2,}\s*/g;
+
+				// Replace the matched pattern with an empty string and return the result
+				return words.replace(regex, '');
 			}
 		}
 	}
