@@ -79,7 +79,7 @@ class Canvas {
 		this.inputText = document.createElement("textarea");
 		this.inputText.setAttribute("id", "pastetxt");
 		this.inputText.setAttribute("rows", "15em");
-		this.inputText.setAttribute("placeholder", "Enter your text here (one line per match)");
+		this.inputText.setAttribute("placeholder", "Enter your text here...");
 		this.inputWrapper.appendChild(this.inputText);
 	}
 }
