@@ -189,7 +189,13 @@ class Purge {
 			
 			function removeSpecifiedPhrases(sentence) {
 				// Define an array of strings to be removed
-				let phrasesToRemove = ["pair together with", "group together with"];
+				let phrasesToRemove = [
+					"pair together with",
+					"group together with",
+					"added in",
+					"updated in",
+					"ask for"
+				];
 				
 				// Remove bracketed phrases
 				sentence = sentence.replace(/(<.*?>|{.*?}|\[.*?\])/g, "");
@@ -227,7 +233,14 @@ class Purge {
 			
 			function removeSpecifiedWords(words) {
 				// Define the words to remove
-				let wordsToRemove = ["terminate", "term", "anchor", "shuffle", "exclusive", "fixed"];
+				let wordsToRemove = [
+					"terminate",
+					"term",
+					"anchor",
+					"shuffle",
+					"exclusive",
+					"fixed"
+				];
 
 				for(let j = 0; j < wordsToRemove.length; j++) {
 					let word = wordsToRemove[j];
