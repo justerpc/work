@@ -130,7 +130,7 @@ class Purge {
 			
 			function removeFirstWord(words) {	
 				let isNonAlphabetic = /^[^a-zA-Z]*$/.test(words[0]) && words[0].charAt(0) != "$";
-				let isSingleAlphabet = words[0].length < 3 && (/^[a-zA-Z]{1}$/.test(words[0].charAt(0)) || /^[a-zA-Z]{1}$/.test(words[0].charAt(1)) || /^[.,<>{}\[\]\(\)]{1}$/.test(words[0].charAt(0)) || /^[.,<>{}\[\]\(\)]{1}$/.test(words[0].charAt(1))) && !/^[ia]$/i.test(words[0]);
+				let isSingleAlphabet = words[0].length < 3 && ((/^[a-zA-Z]{1}$/.test(words[0].charAt(0)) && /^[.,<>{}\[\]\(\)]{1}$/.test(words[0].charAt(1))) || (/^[.,<>{}\[\]\(\)]{1}$/.test(words[0].charAt(0)) && /^[a-zA-Z]{1}$/.test(words[0].charAt(1)))) && !/^[ia]$/i.test(words[0]);
 				let isBracketsNumeric = /^[\d<>\[\]{}()]+$/.test(words[0]);
 
 				// Remove the first word if any of the conditions are true
