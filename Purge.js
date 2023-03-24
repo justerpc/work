@@ -1,4 +1,4 @@
-/* * *   V E R S I O N   5 . 2   * * */
+/* * *   V E R S I O N   5 . 1   * * */
 
 document.querySelector("body").addEventListener("keydown", function(event) {
 	if(event.target.tagName.toLowerCase() === "textarea" && purge.isAssigned) {
@@ -83,6 +83,7 @@ class Purge {
 					lines[i] = removeSpecifiedPhrases(lines[i]);
 					lines[i] = removeFirstWord(lines[i]);
 					lines[i] = removeLastWord(lines[i]);
+					lines[i] = removeSpecifiedWords(lines[i]);
 					
 					// Join the array elements back into a single string
 					lines[i] = lines[i].join(" ");
@@ -128,8 +129,8 @@ class Purge {
 			}
 			
 			function removeFirstWord(words) {	
-				let isNonAlphabetic = words[0].length < 3 && /^[^a-zA-Z]*$/.test(words[0]) && words[0].charAt(0) != "$";
-				let isSingleAlphabet = words[0].length < 3 && ((/^[a-zA-Z]{1}$/.test(words[0].charAt(0)) && /^[.,<>{}\[\]\(\)]{1}$/.test(words[0].charAt(1))) || (/^[.,<>{}\[\]\(\)]{1}$/.test(words[0].charAt(0)) && /^[a-zA-Z]{1}$/.test(words[0].charAt(1)))) && !/^[ia]$/i.test(words[0]);
+				let isNonAlphabetic = /^[^a-zA-Z]*$/.test(words[0]) && words[0].charAt(0) != "$";
+				let isSingleAlphabet = words[0].length < 3 && (/^[a-zA-Z]{1}$/.test(words[0].charAt(0)) || /^[a-zA-Z]{1}$/.test(words[0].charAt(1)) || /^[.,<>{}\[\]\(\)]{1}$/.test(words[0].charAt(0)) || /^[.,<>{}\[\]\(\)]{1}$/.test(words[0].charAt(1))) && !/^[ia]$/i.test(words[0]);
 				let isBracketsNumeric = /^[\d<>\[\]{}()]+$/.test(words[0]);
 
 				// Remove the first word if any of the conditions are true
@@ -141,28 +142,15 @@ class Purge {
 			}
 			
 			function removeLastWord(words) {
-				// Define the words to remove
-				let wordsToRemove = [
-					"terminate",
-					"term",
-					"anchor",
-					"shuffle",
-					"exclusive",
-					"fixed"
-				];
-				
 				let lastWord = words[words.length - 1];
 
-				if (/^[\[\]<>{].*[\}\]>]$/.test(lastWord) || wordsToRemove.map(word => word.toLowerCase()).includes(lastWord.toLowerCase())) {
-					// If any of the conditions are true, remove the last word from the "words" array
+				if(/^[\[\]<>{].*[\}\]>]$/.test(lastWord)) {
 					words.splice(words.length - 1, 1);
 				}
-
-				// Return the modified "words" array
+				
 				return words;
 			}
 			
-			// This function is retired.
 			function removeSpecifiedWords(words) {
 				// Define the words to remove
 				let wordsToRemove = [
