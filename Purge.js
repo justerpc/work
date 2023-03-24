@@ -1,7 +1,7 @@
-/* * *   V E R S I O N   4 . 2   * * */
+/* * *   V E R S I O N   5   * * */
 
-document.querySelector('body').addEventListener('keydown', function(event) {
-	if(event.target.tagName.toLowerCase() === 'textarea' && purge.isAssigned) {
+document.querySelector("body").addEventListener("keydown", function(event) {
+	if(event.target.tagName.toLowerCase() === "textarea" && purge.isAssigned) {
 		purge.purgeTextArea();
 	}
 	else {
@@ -15,7 +15,7 @@ class Purge {
 		let that = this;
 		
 		// Create and add CSS styles to the page
-		this.purgeStyle = document.createElement('style');
+		this.purgeStyle = document.createElement("style");
 		this.projName = "Purge";
 		this.isAssigned = false;
 		
@@ -48,7 +48,7 @@ class Purge {
 	
 	assignTextArea() {
 		// Get the textarea element
-		this.textarea = document.getElementById('pastetxt');
+		this.textarea = document.getElementById("pastetxt");
 		
 		if(this.textarea) {
 			this.isAssigned = true;
@@ -60,13 +60,10 @@ class Purge {
 
 		// Check if the target textarea exists
 		if(this.isAssigned) {
-			// Define the words to remove
-			let wordsToRemove = ['terminate', 'term', 'anchor', 'shuffle', 'exclusive', 'fixed'];
-
 			let timeoutID = null;
 
 			// Add an event listener for the "input" event
-			this.textarea.addEventListener('input', function(event) {
+			this.textarea.addEventListener("input", function(event) {
 				if(that.purgeBtn.textContent === "Purge Enabled") {
 					// Clear any previous timeout
 					clearTimeout(timeoutID);
@@ -78,78 +75,107 @@ class Purge {
 
 			function processText() {
 				// Get the current value of the textarea and split it into an array of lines
-				let lines = that.textarea.value.split('\n');
+				let lines = that.textarea.value.split("\n");
 
 				// Loop through each line and split it into an array of words using whitespace as delimiter
 				for(let i = 0; i < lines.length; i++) {
-					lines[i] = lines[i].split(/\s+/);
-				}
-
-				// Loop through each line and remove the first word if it doesn't contain alphabetic characters or is a non-'I' and non-'i' single alphabetic character
-				for(let i = 0; i < lines.length; i++) {
-					let isNonAlphabetic = /^[^a-zA-Z]*$/.test(lines[i][0]) && lines[i][0].charAt(0) != '$';
-					let isSingleAlphabet = lines[i][0].length < 3 && ((/^[a-zA-Z]{1}$/.test(lines[i][0].charAt(0)) || /^[a-zA-Z]{1}$/.test(lines[i][0].charAt(1))) && !/^i$/i.test(lines[i][0])) && (/^[.,<>{}\[\]\(\)]{1}$/.test(lines[i][0].charAt(0)) || /^[.,<>{}\[\]\(\)]{1}$/.test(lines[i][0].charAt(1)));
-					let isBracketsNumeric = /^[\d<>\[\]{}()]+$/.test(lines[i][0]);
-
-					// Remove the first word if any of the conditions are true
-					if (isNonAlphabetic || isSingleAlphabet || isBracketsNumeric) {
-						lines[i].splice(0, 1);
-					}
-				}
-
-				// Loop through each line and remove the last word if enclosed in curly brackets, angled brackets or square brackets
-				for(let i = 0; i < lines.length; i++) {
-					let lastWord = lines[i][lines[i].length - 1];
-
-					if(/^[\[\]<>{].*[\}\]>]$/.test(lastWord)) {
-						lines[i].splice(lines[i].length - 1, 1);
-					}
-				}
-
-				// Loop through each line and remove the specified words
-				for(let i = 0; i < lines.length; i++) {
-					for(let j = 0; j < wordsToRemove.length; j++) {
-						const word = wordsToRemove[j];
-
-						// match the exact word case-insensitively
-						const regex = new RegExp('\\b' + word + '\\b', 'i');
-
-						// Use Array.prototype.indexOf() to find the index of the exact word instead of string.search() to correctly handle special characters
-						const index = lines[i].findIndex((element) => regex.test(element));
-
-						if(index >= 0) {
-							// If the word is found, remove it from the line
-							lines[i].splice(index, 1);
-						}
-					}
-				}
-
-				// Loop through each line and remove consecutive underscores forming a line
-				for(let i = 0; i < lines.length; i++) {
-					lines[i] = lines[i].map(word => word.replace(/_{2,}/g, ''));
-				}
-
-				// Loop through each line and remove "pair together with" or "group together with" and the next word after it
-				for(let i = 0; i < lines.length; i++) {
-					let line = lines[i].join(" ");
-					line = line.replace(/pair together with\s*\S+/gi, "");
-					line = line.replace(/group together with\s*\S+/gi, "");
-					lines[i] = line.split(" ");
-				}
-
-				// Loop through each line and join the array elements back into a single string
-				for(let i = 0; i < lines.length; i++) {
-					lines[i] = lines[i].join(' ');
+					lines[i] = removeSpecifiedPhrases(lines[i]);
+					lines[i] = removeFirstWord(lines[i]);
+					lines[i] = removeLastWord(lines[i]);
+					lines[i] = removeSpecifiedWords(lines[i]);
+					lines[i] = removeConsecutiveUnderscores(lines[i]);
+					
+					// Join the array elements back into a single string
+					lines[i] = lines[i].join(" ");
 				}
 
 				// Join the lines back into a single string with each line separated by a newline character
-				const processedText = lines.join('\n');
+				const processedText = lines.join("\n");
 
 				// Replace any double spaces with single spaces
-				const cleanedText = processedText.replace(/[\t ]{2,}/g, ' ');
+				const cleanedText = processedText.replace(/[\t ]{2,}/g, " ");
 
 				// Set the updated text as the new value of the textarea
 				that.textarea.value = cleanedText;
+			}
+			
+			function removeSpecifiedPhrases(sentence) {
+				// Define an array of strings to be removed
+				let phrasesToRemove = [
+					"pair together with",
+					"group together with",
+					"added in",
+					"updated in",
+					"ask for"
+				];
+				
+				// Remove bracketed phrases
+				sentence = sentence.replace(/(<.*?>|{.*?}|\[.*?\])/g, "");
+				
+				// Remove specified strings
+				phrasesToRemove.forEach((str) => {
+					sentence = sentence.replace(new RegExp(str + "\\s*\\S+", "gi"), "");
+				});
+
+				return sentence.split(/\s+/);
+			}
+			
+			function removeFirstWord(words) {	
+				let isNonAlphabetic = /^[^a-zA-Z]*$/.test(words[0]) && words[0].charAt(0) != "$";
+				let isSingleAlphabet = words[0].length < 3 && ((/^[a-zA-Z]{1}$/.test(words[0].charAt(0)) || /^[a-zA-Z]{1}$/.test(words[0].charAt(1))) && !/^i$/i.test(words)) && (/^[.,<>{}\[\]\(\)]{1}$/.test(words[0].charAt(0)) || /^[.,<>{}\[\]\(\)]{1}$/.test(words[0].charAt(1)));
+				let isBracketsNumeric = /^[\d<>\[\]{}()]+$/.test(words[0]);
+
+				// Remove the first word if any of the conditions are true
+				if (isNonAlphabetic || isSingleAlphabet || isBracketsNumeric) {
+					words.splice(0, 1);
+				}
+				
+				return words;
+			}
+			
+			function removeLastWord(words) {
+				let lastWord = words[words.length - 1];
+
+				if(/^[\[\]<>{].*[\}\]>]$/.test(lastWord)) {
+					words.splice(words.length - 1, 1);
+				}
+				
+				return words;
+			}
+			
+			function removeSpecifiedWords(words) {
+				// Define the words to remove
+				let wordsToRemove = [
+					"terminate",
+					"term",
+					"anchor",
+					"shuffle",
+					"exclusive",
+					"fixed"
+				];
+
+				for(let j = 0; j < wordsToRemove.length; j++) {
+					let word = wordsToRemove[j];
+
+					// match the exact word case-insensitively
+					let regex = new RegExp("\\b" + word + "\\b", "i");
+
+					// Use Array.prototype.indexOf() to find the index of the exact word instead of string.search() to correctly handle special characters
+					let index = words.findIndex((element) => regex.test(element));
+
+					if(index >= 0) {
+						// If the word is found, remove it from the line
+						words.splice(index, 1);
+					}
+				}
+				
+				return words;
+			}
+			
+			function removeConsecutiveUnderscores(words) {
+				words = words.map(word => word.replace(/_{2,}/g, ""));
+				
+				return words;
 			}
 		}
 	}
