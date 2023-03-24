@@ -1,3 +1,91 @@
+/* * *   V E R S I O N   2   * * */
+
+class Canvas {
+	constructor() {
+		let that = this;
+		
+		// Create and add CSS styles to the page
+		this.style = document.createElement('style');
+		this.projName = "Canvas";
+		
+		this.style.textContent = `
+			#canvasBtn {
+				position: fixed;
+				bottom: 0;
+				right: 0;
+				margin: 1em;
+				z-index: 10000;
+			}
+			
+			#canvas {
+				display: none;
+				position: fixed;
+				bottom: 0;
+				left: 0;
+				right: 0;
+				background-color: #f2f2f2;
+				padding: 20px;
+				max-height: 60vh;
+				overflow-y: auto;
+				z-index: 9999;
+				font-family: Arial, Helvetica, sans-serif;
+			}
+			
+			#inputWrapper {
+				display: block;
+				width: 100%;
+				gap: 10px;
+			}
+			
+			#inputText {
+				width: 100%;
+				margin: 10px 0;
+				padding: 5px;
+				font-size: 16px;
+				border: none;
+				border-radius: 3px;
+				box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+			}
+		`;
+
+		document.head.appendChild(this.style);
+		
+		// Create and add the container
+		this.canvas = document.createElement("div");
+		this.canvas.setAttribute("id", "canvas");
+		document.body.appendChild(this.canvas);
+		
+		// Show or hide the container when the canvas button is clicked
+		this.canvasBtn = document.createElement("button");
+		this.canvasBtn.setAttribute("id", "canvasBtn");
+		this.canvasBtn.textContent = this.projName;
+		this.canvasBtn.onclick = toggleCanvas;
+		document.body.appendChild(this.canvasBtn);
+
+		function toggleCanvas() {
+			let canvasStyle = window.getComputedStyle(that.canvas);
+			let displayValue = canvasStyle.getPropertyValue("display");
+			
+			that.canvas.style.display = displayValue === "none" ? "flex" : "none";
+			that.canvasBtn.textContent = displayValue === "none" ? "Close" : that.projName;
+		}
+		
+		// Create and add the input wrapper
+		this.inputWrapper = document.createElement("div");
+		this.inputWrapper.setAttribute("id", "inputWrapper");
+		this.canvas.appendChild(this.inputWrapper);
+
+		// Create and add the text area
+		this.inputText = document.createElement("textarea");
+		this.inputText.setAttribute("id", "pastetxt");
+		this.inputText.setAttribute("rows", "15em");
+		this.inputText.setAttribute("placeholder", "Enter your text here...");
+		this.inputWrapper.appendChild(this.inputText);
+	}
+}
+
+const canvas = new Canvas();
+
 /* * *   V E R S I O N   5 . 2   * * */
 
 document.querySelector("body").addEventListener("keydown", function(event) {
