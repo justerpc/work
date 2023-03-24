@@ -1,4 +1,4 @@
-/* * *   V E R S I O N   5 . 1   * * */
+/* * *   V E R S I O N   5 . 2   * * */
 
 document.querySelector("body").addEventListener("keydown", function(event) {
 	if(event.target.tagName.toLowerCase() === "textarea" && purge.isAssigned) {
@@ -83,7 +83,6 @@ class Purge {
 					lines[i] = removeSpecifiedPhrases(lines[i]);
 					lines[i] = removeFirstWord(lines[i]);
 					lines[i] = removeLastWord(lines[i]);
-					lines[i] = removeSpecifiedWords(lines[i]);
 					
 					// Join the array elements back into a single string
 					lines[i] = lines[i].join(" ");
@@ -114,7 +113,8 @@ class Purge {
 					"group together with",
 					"added in",
 					"updated in",
-					"ask for"
+					"ask for",
+					"removed in"
 				];
 				
 				// Remove bracketed phrases
@@ -129,8 +129,8 @@ class Purge {
 			}
 			
 			function removeFirstWord(words) {	
-				let isNonAlphabetic = /^[^a-zA-Z]*$/.test(words[0]) && words[0].charAt(0) != "$";
-				let isSingleAlphabet = words[0].length < 3 && (/^[a-zA-Z]{1}$/.test(words[0].charAt(0)) || /^[a-zA-Z]{1}$/.test(words[0].charAt(1)) || /^[.,<>{}\[\]\(\)]{1}$/.test(words[0].charAt(0)) || /^[.,<>{}\[\]\(\)]{1}$/.test(words[0].charAt(1))) && !/^[ia]$/i.test(words[0]);
+				let isNonAlphabetic = words[0].length < 3 && /^[^a-zA-Z]*$/.test(words[0]) && words[0].charAt(0) != "$";
+				let isSingleAlphabet = words[0].length < 3 && ((/^[a-zA-Z]{1}$/.test(words[0].charAt(0)) && /^[.,<>{}\[\]\(\)]{1}$/.test(words[0].charAt(1))) || (/^[.,<>{}\[\]\(\)]{1}$/.test(words[0].charAt(0)) && /^[a-zA-Z]{1}$/.test(words[0].charAt(1)))) && !/^[ia]$/i.test(words[0]);
 				let isBracketsNumeric = /^[\d<>\[\]{}()]+$/.test(words[0]);
 
 				// Remove the first word if any of the conditions are true
@@ -138,20 +138,10 @@ class Purge {
 					words.splice(0, 1);
 				}
 				
-				return words;
+				return removeWhitespaceElements(words);
 			}
 			
 			function removeLastWord(words) {
-				let lastWord = words[words.length - 1];
-
-				if(/^[\[\]<>{].*[\}\]>]$/.test(lastWord)) {
-					words.splice(words.length - 1, 1);
-				}
-				
-				return words;
-			}
-			
-			function removeSpecifiedWords(words) {
 				// Define the words to remove
 				let wordsToRemove = [
 					"terminate",
@@ -159,25 +149,49 @@ class Purge {
 					"anchor",
 					"shuffle",
 					"exclusive",
-					"fixed"
+					"fixed",
+					"monitor"
 				];
 
-				for(let j = 0; j < wordsToRemove.length; j++) {
+				// Get the last word from the words array
+				let lastWord = words[words.length - 1];
+
+				// Step 1: Remove the last word if it is enclosed in brackets
+				if (/^[\[\]<>{].*[\}\]>]$/.test(lastWord)) {
+					words.splice(words.length - 1, 1);
+				}
+				
+				// Step 2: Remove the last word if it matches a word in wordsToRemove
+				lastWord = words[words.length - 1];
+				
+				for (let j = 0; j < wordsToRemove.length; j++) {
 					let word = wordsToRemove[j];
 
-					// match the exact word case-insensitively
+					// Match the exact word case-insensitively with word boundaries
 					let regex = new RegExp("\\b" + word + "\\b", "i");
 
-					// Use Array.prototype.indexOf() to find the index of the exact word instead of string.search() to correctly handle special characters
-					let index = words.findIndex((element) => regex.test(element));
 
-					if(index >= 0) {
-						// If the word is found, remove it from the line
-						words.splice(index, 1);
+					// Test the last word with the regex
+					if (regex.test(lastWord)) {
+						// If the last word matches, remove it from the words array
+						words.splice(words.length - 1, 1);
+						break;
 					}
 				}
 				
-				return words;
+				return removeWhitespaceElements(words);
+			}
+			
+			function removeWhitespaceElements(words) {
+				// Filter the words using a callback function that returns true for strings that don't have only whitespaces
+				const result = words.filter(function (str) {
+					// Use regex to test if the current string contains only whitespaces
+					// If the string contains any other character, the test returns false, and we keep it in the array
+					return !/^\s*$/.test(str);
+				});
+
+				// Return the modified array
+				return result;
 			}
 		}
 	}
