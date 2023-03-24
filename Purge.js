@@ -99,6 +99,14 @@ class Purge {
 				that.textarea.value = cleanedText;
 			}
 			
+			function removeConsecutiveUnderscores(words) {
+				// Use regular expression to match consecutive underscores (at least two) with optional surrounding whitespace
+				let regex = /\s*_{2,}\s*/g;
+
+				// Replace the matched pattern with an empty string and return the result
+				return words.replace(regex, '');
+			}
+			
 			function removeSpecifiedPhrases(sentence) {
 				// Define an array of strings to be removed
 				let phrasesToRemove = [
@@ -170,14 +178,6 @@ class Purge {
 				}
 				
 				return words;
-			}
-			
-			function removeConsecutiveUnderscores(words) {
-				// Use regular expression to match consecutive underscores (at least two) with optional surrounding whitespace
-				let regex = /\s*_{2,}\s*/g;
-
-				// Replace the matched pattern with an empty string and return the result
-				return words.replace(regex, '');
 			}
 		}
 	}
