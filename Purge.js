@@ -151,7 +151,8 @@ class Purge {
 					"shuffle",
 					"exclusive",
 					"fixed",
-					"monitor"
+					"monitor",
+					"response",
 				];
 
 				// Get the last word from the words array
