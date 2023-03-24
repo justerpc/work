@@ -83,7 +83,6 @@ class Purge {
 					lines[i] = removeSpecifiedPhrases(lines[i]);
 					lines[i] = removeFirstWord(lines[i]);
 					lines[i] = removeLastWord(lines[i]);
-					lines[i] = removeSpecifiedWords(lines[i]);
 					
 					// Join the array elements back into a single string
 					lines[i] = lines[i].join(" ");
@@ -142,15 +141,28 @@ class Purge {
 			}
 			
 			function removeLastWord(words) {
+				// Define the words to remove
+				let wordsToRemove = [
+					"terminate",
+					"term",
+					"anchor",
+					"shuffle",
+					"exclusive",
+					"fixed"
+				];
+				
 				let lastWord = words[words.length - 1];
 
-				if(/^[\[\]<>{].*[\}\]>]$/.test(lastWord)) {
+				if (/^[\[\]<>{].*[\}\]>]$/.test(lastWord) || wordsToRemove.map(word => word.toLowerCase()).includes(lastWord.toLowerCase())) {
+					// If any of the conditions are true, remove the last word from the "words" array
 					words.splice(words.length - 1, 1);
 				}
-				
+
+				// Return the modified "words" array
 				return words;
 			}
 			
+			// This function is retired.
 			function removeSpecifiedWords(words) {
 				// Define the words to remove
 				let wordsToRemove = [
