@@ -261,10 +261,11 @@ class Purge {
 			}
 			
 			function removeConsecutiveUnderscores(words) {
-				words = words.map(word => word.replace(/_{2,}/g, ""));
-				
+				words = words.map(word => word.replace(/\s*_{2,}\s*/g, ""));
+
 				return words;
 			}
+
 		}
 	}
 }
