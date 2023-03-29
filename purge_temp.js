@@ -1,253 +1,291 @@
-/* * *   V E R S I O N   6   * * */
+jsearch();
 
-document.querySelector("body").addEventListener("keydown", function(event) {
-	if(event.target.tagName.toLowerCase() === "textarea" && purge.isAssigned) {
-		purge.purgeTextArea();
-	}
-	else {
-		purge.assignTextArea();
-		purge.purgeTextArea();
-	}
-});
-
-class Purge {
-	constructor() {
-		let that = this;
-		
-		// Create and add CSS styles to the page
-		this.purgeStyle = document.createElement("style");
-		this.projName = "Purge";
-		this.isAssigned = false;
-		
-		this.purgeStyle.textContent = `
-			#purgeBtn {
-				position: fixed;
-				bottom: 0;
-				left: 0;
-				margin: 1em;
-				z-index: 10000;
-			}
-		`;
-		
-		document.head.appendChild(this.purgeStyle);
-		
-		// Add Purge button to the web page
-		this.purgeBtn = document.createElement("button");
-		this.purgeBtn.setAttribute("id", "purgeBtn");
-		this.purgeBtn.textContent = this.projName + " All";
-		document.body.appendChild(this.purgeBtn);
-		
-		// Add onclick listener to the textarea
-		this.purgeBtn.onclick = togglePurgeBtn;
-		
-		function togglePurgeBtn() {
-			let purgeStatus = that.purgeBtn.textContent;
-			that.purgeBtn.textContent = ((purgeStatus === "Purge Disabled") ? "Purge Enabled" : "Purge Disabled");
-			
-			if(purgeStatus == "Purge Disabled") {
-				that.purgeBtn.textContent = "Purge All";
-			}
-			else if(purgeStatus == "Purge All") {
-				that.purgeBtn.textContent = "Purge PN";
-			}
-			else {
-				that.purgeBtn.textContent = "Purge Disabled";
-			}
+function jsearch() {
+	// Create and add CSS styles to the page
+	const style = document.createElement('style');
+	style.textContent = `
+		#searchBtn {
+			position: fixed;
+			bottom: 0;
+			right: 0;
+			margin: 1em;
+			z-index: 10000;
 		}
-	}
-	
-	assignTextArea() {
-		// Get the textarea element
-		this.textarea = document.getElementById("pastetxt");
-		
-		if(this.textarea) {
-			this.isAssigned = true;
+		#container {
+			display: none;
+			position: fixed;
+			bottom: 0;
+			left: 0;
+			right: 0;
+			background-color: #f2f2f2;
+			padding: 20px;
+			z-index: 9999;
+			font-family: Arial, Helvetica, sans-serif;
 		}
-	}
-	
-	purgeTextArea() {
-		let that = this;
+		#inputWrapper {
+			display: flex;
+			flex-direction: column;
+			width: 100%;
+			gap: 10px;
+		}
+		#inputText {
+			height: 15em;
+			width: 100%;
+			margin: 10px 0;
+			padding: 5px;
+			font-size: 16px;
+			border: none;
+			border-radius: 3px;
+			box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+		}
+		#matchBtn {
+			background-color: #007bff;
+			border: none;
+			color: #fff;
+			font-size: 16px;
+			padding: 5px 10px;
+			margin-bottom: 1em;
+			border-radius: 3px;
+			cursor: pointer;
+		}
+		#matchBtn:hover {
+			background-color: #0069d9;
+		}
+		#outputTable {
+			border-collapse: collapse;
+			width: 100%;
+			margin: 1em;
+		}
+		#outputTable,
+		#outputTable th,
+		#outputTable td {
+			border: 1px solid black;
+			padding: 8px;
+			text-align: left;
+		}
+		#outputTable th {
+			background-color: #f2f2f2;
+			font-weight: bold;
+		}
+		.green {
+			background-color: #32FF7E;
+		}
+		.orange {
+			background-color: #FFC048;
+		}
+		.red {
+			background-color: #FF7979;
+		}
+	`;
 
-		// Check if the target textarea exists
-		if(this.isAssigned) {
-			let timeoutID = null;
+	document.head.appendChild(style);
 
-			// Add an event listener for the "input" event
-			this.textarea.addEventListener("input", function(event) {
-				if(that.purgeBtn.textContent !== "Purge Disabled") {
-					// Clear any previous timeout
-					clearTimeout(timeoutID);
+	// Create and add the container
+	const container = document.createElement("div");
+	container.setAttribute("id", "container");
+	document.body.appendChild(container);
 
-					// Set a new timeout to execute the processing function after a delay of 500ms
-					timeoutID = setTimeout(processText(that.purgeBtn.textContent), 500);
-				}
+	// Create and add the input wrapper
+	const inputWrapper = document.createElement("div");
+	inputWrapper.setAttribute("id", "inputWrapper");
+	container.appendChild(inputWrapper);
+
+	// Create and add the text area
+	const inputText = document.createElement("textarea");
+	inputText.setAttribute("id", "inputText");
+	inputText.setAttribute("placeholder", "Enter your text here (one line per match)");
+	inputWrapper.appendChild(inputText);
+
+	// Create and add the 'Find Match' button
+	const matchBtn = document.createElement("button");
+	matchBtn.setAttribute("id", "matchBtn");
+	matchBtn.textContent = "Find Match";
+	inputWrapper.appendChild(matchBtn);
+
+	// Create and add the output table
+	const outputTable = document.createElement("table");
+	outputTable.setAttribute("id", "outputTable");
+	container.appendChild(outputTable);
+
+	// Listener wrapping the extractTextFromHTML() function and binding it to the 'Find Match' button
+	matchBtn.addEventListener('click', function(){
+		trimLines(inputText);
+
+		const parentElement = document.body;
+		const textArray = extractTextFromHTML(parentElement, container);
+
+		const inputTextValue = inputText.value;
+		const inputLines = inputTextValue.split('\n');
+
+		const matchCount = {};
+		const caseSensitiveMatchCount = {};
+		inputLines.forEach(line => {
+			if (line.trim() !== '') {
+				matchCount[line.toLowerCase()] = 0;
+				caseSensitiveMatchCount[line] = 0;
+			}
+		});
+
+		// Updating the regular expressions to allow for matching of phrases
+		textArray.forEach(text => {
+			Object.keys(matchCount).forEach(lineLower => {
+				const line = inputLines.find(item => item.toLowerCase() === lineLower);
+
+				const escapedLineLower = lineLower.replace(/[.*+\-?^${}()|[\]\\]/g, '\\$&');
+				const escapedLine = line.replace(/[.*+\-?^${}()|[\]\\]/g, '\\$&');
+
+				// Check if the lowercase line occurs either surrounded by non-alphanumeric characters or at the start/end of the string
+				const lineLowerRegex = new RegExp(`(^|\\W)${escapedLineLower}(\\W|$)`, 'gi');
+				const lineLowerMatches = text.toLowerCase().match(lineLowerRegex);
+
+				// Check if the original case line occurs either surrounded by non-alphanumeric characters or at the start/end of the string
+				const lineRegex = new RegExp(`(^|\\W)${escapedLine}(\\W|$)`, 'g');
+				const lineMatches = text.match(lineRegex);
+
+				// Increase count for each complete word/phrase match found
+				if (lineLowerMatches) matchCount[lineLower] += lineLowerMatches.length;
+				if (lineMatches) caseSensitiveMatchCount[line] += lineMatches.length;
 			});
+		});
 
-			function processText(mode) {
-				// Get the current value of the textarea and split it into an array of lines
-				let lines = that.textarea.value.split("\n");
+		outputTable.innerHTML = `<tr>
+									<th>User Input</th>
+									<th>Exact Match</th>
+									<th>Case-Insensitive Match</th>
+								  </tr>`;
 
-				// Loop through each line and split it into an array of words using whitespace as delimiter
-				for(let i = 0; i < lines.length; i++) {
-					if(mode === "Purge All") {
-						lines[i] = removeConsecutiveUnderscores(lines[i]);
-						lines[i] = removeSpecifiedPhrases(lines[i]);
-						lines[i] = removeFirstWord(lines[i]);
-						lines[i] = removeLastWord(lines[i]);
-					}
-					else if(mode === "Purge PN") {
-						lines[i] = removeConsecutiveUnderscores(lines[i]);
-						lines[i] = removeSpecifiedPhrasesExclFirstWord(lines[i]);
-						lines[i] = removeLastWord(lines[i]);
-					}
-					
-					// Join the array elements back into a single string
-					lines[i] = lines[i].join(" ");
+		Object.keys(matchCount).forEach(lineLower => {
+			const line = inputLines.find(item => item.toLowerCase() === lineLower);
+			if (line.trim() !== '') {
+
+				let rowClass = 'red';
+				if (caseSensitiveMatchCount[line] === matchCount[lineLower] && caseSensitiveMatchCount[line] > 0) {
+					rowClass = 'green';
+				} else if (caseSensitiveMatchCount[line] !== matchCount[lineLower] && (caseSensitiveMatchCount[line] > 0 || matchCount[lineLower] > 0)) {
+					rowClass = 'orange';
 				}
 
-				// Join the lines back into a single string with each line separated by a newline character
-				let processedText = lines.join("\n");
+				const resultRow = document.createElement('tr');
+				resultRow.setAttribute('class', rowClass);
 
-				// Replace any double spaces with single spaces
-				let cleanedText = processedText.replace(/[\t ]{2,}/g, " ");
+				const userInput = document.createElement('td');
+				userInput.textContent = line;
+				resultRow.appendChild(userInput);
 
-				// Set the updated text as the new value of the textarea
-				that.textarea.value = cleanedText;
+				const exactMatch = document.createElement('td');
+				exactMatch.textContent = caseSensitiveMatchCount[line];
+				resultRow.appendChild(exactMatch);
+
+				const insensitiveMatch = document.createElement('td');
+				insensitiveMatch.textContent = matchCount[lineLower];
+				resultRow.appendChild(insensitiveMatch);
+
+				outputTable.appendChild(resultRow);
 			}
-			
-			function removeConsecutiveUnderscores(words) {
-				// Use regular expression to match consecutive underscores (at least two) with optional surrounding whitespace
-				let regex = /\s*_{2,}\s*/g;
+		});
+	});
 
-				// Replace the matched pattern with an empty string and return the result
-				return words.replace(regex, '');
-			}
-			
-			function removeSpecifiedPhrases(sentence) {
-				// Define an array of strings to be removed
-				let phrasesToRemove = [
-					"pair together with",
-					"group together with",
-					"added in",
-					"updated in",
-					"ask for",
-					"removed in"
-				];
-				
-				// Remove bracketed phrases
-				sentence = sentence.replace(/(<.*?>|{.*?}|\[.*?\])/g, "");
-				
-				// Remove specified strings
-				phrasesToRemove.forEach((str) => {
-					sentence = sentence.replace(new RegExp(str + "\\s*\\S+", "gi"), "");
-				});
+	// Show/hide the container when the search button is clicked
+	const searchBtn = document.createElement("button");
+	searchBtn.setAttribute("id", "searchBtn");
+	searchBtn.textContent = "Search";
+	searchBtn.onclick = toggleContainer;
+	document.body.appendChild(searchBtn);
 
-				return sentence.split(/\s+/);
-			}
-			
-			function removeSpecifiedPhrasesExclFirstWord(sentence) {
-				// Define an array of strings to be removed
-				let phrasesToRemove = [
-					"pair together with",
-					"group together with",
-					"added in",
-					"updated in",
-					"ask for",
-					"removed in"
-				];
+	function toggleContainer() {
+		const containerStyle = window.getComputedStyle(container);
+		const displayValue = containerStyle.getPropertyValue("display");
+		container.style.display = displayValue === "none" ? "flex" : "none";
+		searchBtn.textContent = displayValue === "none" ? "Close" : "Search";
+	}
 
-				// Split the sentence into an array of words
-				let words = sentence.split(/\s+/);
+	// The updated extractTextFromHTML() function
+	function extractTextFromHTML(parentElement, excludedElement) {
+		const textValues = [];
 
-				// Take the first word from the array and remove it for later use
-				let firstWord = words.shift();
+		function getTextRecursively(element) {
+			// Get the computed value of "display" and "visibility" properties
+			const displayValue = window.getComputedStyle(element).getPropertyValue('display');
+			const visibilityValue = window.getComputedStyle(element).getPropertyValue('visibility');
 
-				// Create a new modified sentence without the first word
-				let modifiedSentence = words.join(' ');
+			// Check if the parent element has style property "display: none" or "visibility: hidden".
+			const isHidden = (displayValue === 'none') || (visibilityValue === 'hidden');
 
-				// Remove bracketed phrases
-				modifiedSentence = modifiedSentence.replace(/(<.*?>|{.*?}|\[.*?\])/g, "");
-
-				// Remove specified strings
-				phrasesToRemove.forEach((str) => {
-					modifiedSentence = modifiedSentence.replace(new RegExp(str + "\\s*\\S+", "gi"), "");
-				});
-
-				// Combine the first word with the remaining modified sentence
-				let finalSentence = `${firstWord} ${modifiedSentence}`;
-
-				// Return the final sentence as an array of words
-				return finalSentence.split(/\s+/);
-			}
-
-			function removeFirstWord(words) {	
-				let isNonAlphabetic = words[0].length < 3 && /^[^a-zA-Z]*$/.test(words[0]) && words[0].charAt(0) != "$";
-				let isSingleAlphabet = words[0].length < 2 && /^[a-zA-Z]{1}$/.test(words[0]) && !/^[ia]$/i.test(words[0]);
-				let isBracketsAlphabet = words[0].length > 1 && words[0].length < 3 && ((/^[a-zA-Z]{1}$/.test(words[0].charAt(0)) && /^[.,<>{}\[\]\(\)]{1}$/.test(words[0].charAt(1))) || (/^[.,<>{}\[\]\(\)]{1}$/.test(words[0].charAt(0)) && /^[a-zA-Z]{1}$/.test(words[0].charAt(1)))) && !/^[ia]$/i.test(words[0]);
-				let isBracketsNumeric = /^[\d<>\[\]{}()]+$/.test(words[0]);
-
-				// Remove the first word if any of the conditions are true
-				if (isNonAlphabetic || isSingleAlphabet || isBracketsAlphabet || isBracketsNumeric) {
-					words.splice(0, 1);
+			if (!isHidden && element.childNodes) {
+			  for (let node of element.childNodes) {
+				if (node !== excludedElement) {
+				  if (node.nodeType === Node.TEXT_NODE && node.textContent.trim()) {
+					textValues.push(node.textContent.trim());
+				  } else if (node.nodeType === Node.ELEMENT_NODE) {
+					// If the element is not hidden, we proceed with extracting text recursively:
+					getTextRecursively(node);
+				  }
 				}
-				
-				return removeWhitespaceElements(words);
-			}
-			
-			function removeLastWord(words) {
-				// Define the words to remove
-				let wordsToRemove = [
-					"terminate",
-					"term",
-					"anchor",
-					"shuffle",
-					"exclusive",
-					"fixed",
-					"monitor"
-				];
-
-				// Get the last word from the words array
-				let lastWord = words[words.length - 1];
-
-				// Step 1: Remove the last word if it is enclosed in brackets
-				if (/^[\[\]<>{].*[\}\]>]$/.test(lastWord)) {
-					words.splice(words.length - 1, 1);
-				}
-				
-				// Step 2: Remove the last word if it matches a word in wordsToRemove
-				lastWord = words[words.length - 1];
-				
-				for (let j = 0; j < wordsToRemove.length; j++) {
-					let word = wordsToRemove[j];
-
-					// Match the exact word case-insensitively with word boundaries
-					let regex = new RegExp("\\b" + word + "\\b", "i");
-
-
-					// Test the last word with the regex
-					if (regex.test(lastWord)) {
-						// If the last word matches, remove it from the words array
-						words.splice(words.length - 1, 1);
-						break;
-					}
-				}
-				
-				return removeWhitespaceElements(words);
-			}
-			
-			function removeWhitespaceElements(words) {
-				// Filter the words using a callback function that returns true for strings that don't have only whitespaces
-				let result = words.filter(function (str) {
-					// Use regex to test if the current string contains only whitespaces
-					// If the string contains any other character, the test returns false, and we keep it in the array
-					return !/^\s*$/.test(str);
-				});
-
-				// Return the modified array
-				return result;
+			  }
 			}
 		}
-	}
-}
 
-const purge = new Purge();
+		// Call the recursive function on the parent element:
+		getTextRecursively(parentElement);
+
+		return textValues;
+	}
+
+	
+	// Function to remove spaces before and after each line in the textarea
+	function trimLines(inputText) {
+		const lines = inputText.value.split('\n');
+		const formattedLines = lines.map(line => line.trim());
+		inputText.value = formattedLines.join('\n');
+	}
+
+	// Function to remove spaces before and after each line in the textarea
+	function removeSpaceBeforeLines(inputText) {
+		const lines = inputText.value.split('\n');
+		const formattedLines = lines.map(line => line.replace(/^\s+/, ''));
+		inputText.value = formattedLines.join('\n');
+	}
+
+	// Function to remove the specified words from the textarea
+	function removeWordsFromTextarea(inputText, wordsArray) {
+		const regex = new RegExp(`\\b(${wordsArray.join('|')})\\b`, 'ig');
+		const lines = inputText.value.split('\n');
+
+		const updatedLines = lines.map(line => {
+			let words = line.split(/\s+/);
+			if (words.length > 0) {
+				// Check if the first word matches the specified conditions
+				if (/^[a-zA-Z0-9]+[.,()\[\]]/.test(words[0]) && words[0].length <= 3) {
+					words.shift(); // Remove the first word
+				}
+			}
+			// Remove words listed in wordsArray variable from the current line
+			const updatedLine = words.join(' ').replace(regex, '');
+
+			return updatedLine;
+		});
+
+		inputText.value = updatedLines.join('\n');
+	}
+
+	const wordsToRemove = ['terminate', 'anchor'];
+
+	// Add 'input' event listener to call removeWordsFromTextarea and removeSpaceBeforeLines on user input
+	inputText.addEventListener('input', () => {
+		removeWordsFromTextarea(inputText, wordsToRemove);
+		removeSpaceBeforeLines(inputText);
+	});
+
+	// Add event listener for keyboard input
+	document.addEventListener('keydown', (event) => {
+		if (event.ctrlKey && event.key === 'b') {   // Trigger the findMatch function when "ctrl" + "b" is pressed
+			const userInput = inputText.value.trim().replace(/\(\d+\)$/gm, '').trim();
+
+			if(userInput) {
+			  matchBtn.click();
+			} else {
+			  alert('Please enter a text to search');
+			}
+		}
+	});	
+}
