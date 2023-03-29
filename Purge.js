@@ -114,7 +114,8 @@ class Purge {
 					"added in",
 					"updated in",
 					"ask for",
-					"removed in"
+					"removed in",
+					"open end"
 				];
 				
 				// Remove bracketed phrases
