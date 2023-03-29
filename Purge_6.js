@@ -153,7 +153,8 @@ class Purge {
 					"added in",
 					"updated in",
 					"ask for",
-					"removed in"
+					"removed in",
+					"open end"
 				];
 
 				// Split the sentence into an array of words
@@ -203,7 +204,8 @@ class Purge {
 					"shuffle",
 					"exclusive",
 					"fixed",
-					"monitor"
+					"monitor",
+					"response"
 				];
 
 				// Get the last word from the words array
