@@ -1,92 +1,4 @@
-/* * *   V E R S I O N   2   * * */
-
-class Canvas {
-	constructor() {
-		let that = this;
-		
-		// Create and add CSS styles to the page
-		this.style = document.createElement('style');
-		this.projName = "Canvas";
-		
-		this.style.textContent = `
-			#canvasBtn {
-				position: fixed;
-				bottom: 0;
-				right: 0;
-				margin: 1em;
-				z-index: 10000;
-			}
-			
-			#canvas {
-				display: none;
-				position: fixed;
-				bottom: 0;
-				left: 0;
-				right: 0;
-				background-color: #f2f2f2;
-				padding: 20px;
-				max-height: 60vh;
-				overflow-y: auto;
-				z-index: 9999;
-				font-family: Arial, Helvetica, sans-serif;
-			}
-			
-			#inputWrapper {
-				display: block;
-				width: 100%;
-				gap: 10px;
-			}
-			
-			#inputText {
-				width: 100%;
-				margin: 10px 0;
-				padding: 5px;
-				font-size: 16px;
-				border: none;
-				border-radius: 3px;
-				box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
-			}
-		`;
-
-		document.head.appendChild(this.style);
-		
-		// Create and add the container
-		this.canvas = document.createElement("div");
-		this.canvas.setAttribute("id", "canvas");
-		document.body.appendChild(this.canvas);
-		
-		// Show or hide the container when the canvas button is clicked
-		this.canvasBtn = document.createElement("button");
-		this.canvasBtn.setAttribute("id", "canvasBtn");
-		this.canvasBtn.textContent = this.projName;
-		this.canvasBtn.onclick = toggleCanvas;
-		document.body.appendChild(this.canvasBtn);
-
-		function toggleCanvas() {
-			let canvasStyle = window.getComputedStyle(that.canvas);
-			let displayValue = canvasStyle.getPropertyValue("display");
-			
-			that.canvas.style.display = displayValue === "none" ? "flex" : "none";
-			that.canvasBtn.textContent = displayValue === "none" ? "Close" : that.projName;
-		}
-		
-		// Create and add the input wrapper
-		this.inputWrapper = document.createElement("div");
-		this.inputWrapper.setAttribute("id", "inputWrapper");
-		this.canvas.appendChild(this.inputWrapper);
-
-		// Create and add the text area
-		this.inputText = document.createElement("textarea");
-		this.inputText.setAttribute("id", "pastetxt");
-		this.inputText.setAttribute("rows", "15em");
-		this.inputText.setAttribute("placeholder", "Enter your text here...");
-		this.inputWrapper.appendChild(this.inputText);
-	}
-}
-
-const canvas = new Canvas();
-
-/* * *   V E R S I O N   5 . 2   * * */
+/* * *   V E R S I O N   6   * * */
 
 document.querySelector("body").addEventListener("keydown", function(event) {
 	if(event.target.tagName.toLowerCase() === "textarea" && purge.isAssigned) {
@@ -122,7 +34,7 @@ class Purge {
 		// Add Purge button to the web page
 		this.purgeBtn = document.createElement("button");
 		this.purgeBtn.setAttribute("id", "purgeBtn");
-		this.purgeBtn.textContent = this.projName + " Enabled";
+		this.purgeBtn.textContent = this.projName + " All";
 		document.body.appendChild(this.purgeBtn);
 		
 		// Add onclick listener to the textarea
@@ -131,6 +43,16 @@ class Purge {
 		function togglePurgeBtn() {
 			let purgeStatus = that.purgeBtn.textContent;
 			that.purgeBtn.textContent = ((purgeStatus === "Purge Disabled") ? "Purge Enabled" : "Purge Disabled");
+			
+			if(purgeStatus == "Purge Disabled") {
+				that.purgeBtn.textContent = "Purge All";
+			}
+			else if(purgeStatus == "Purge All") {
+				that.purgeBtn.textContent = "Purge PN";
+			}
+			else {
+				that.purgeBtn.textContent = "Purge Disabled";
+			}
 		}
 	}
 	
@@ -152,35 +74,42 @@ class Purge {
 
 			// Add an event listener for the "input" event
 			this.textarea.addEventListener("input", function(event) {
-				if(that.purgeBtn.textContent === "Purge Enabled") {
+				if(that.purgeBtn.textContent !== "Purge Disabled") {
 					// Clear any previous timeout
 					clearTimeout(timeoutID);
 
 					// Set a new timeout to execute the processing function after a delay of 500ms
-					timeoutID = setTimeout(processText(), 500);
+					timeoutID = setTimeout(processText(that.purgeBtn.textContent), 500);
 				}
 			});
 
-			function processText() {
+			function processText(mode) {
 				// Get the current value of the textarea and split it into an array of lines
 				let lines = that.textarea.value.split("\n");
 
 				// Loop through each line and split it into an array of words using whitespace as delimiter
 				for(let i = 0; i < lines.length; i++) {
-					lines[i] = removeConsecutiveUnderscores(lines[i]);
-					lines[i] = removeSpecifiedPhrases(lines[i]);
-					lines[i] = removeFirstWord(lines[i]);
-					lines[i] = removeLastWord(lines[i]);
+					if(mode === "Purge All") {
+						lines[i] = removeConsecutiveUnderscores(lines[i]);
+						lines[i] = removeSpecifiedPhrases(lines[i]);
+						lines[i] = removeFirstWord(lines[i]);
+						lines[i] = removeLastWord(lines[i]);
+					}
+					else if(mode === "Purge PN") {
+						lines[i] = removeConsecutiveUnderscores(lines[i]);
+						lines[i] = removeSpecifiedPhrasesExclFirstWord(lines[i]);
+						lines[i] = removeLastWord(lines[i]);
+					}
 					
 					// Join the array elements back into a single string
 					lines[i] = lines[i].join(" ");
 				}
 
 				// Join the lines back into a single string with each line separated by a newline character
-				const processedText = lines.join("\n");
+				let processedText = lines.join("\n");
 
 				// Replace any double spaces with single spaces
-				const cleanedText = processedText.replace(/[\t ]{2,}/g, " ");
+				let cleanedText = processedText.replace(/[\t ]{2,}/g, " ");
 
 				// Set the updated text as the new value of the textarea
 				that.textarea.value = cleanedText;
@@ -216,6 +145,41 @@ class Purge {
 				return sentence.split(/\s+/);
 			}
 			
+			function removeSpecifiedPhrasesExclFirstWord(sentence) {
+				// Define an array of strings to be removed
+				let phrasesToRemove = [
+					"pair together with",
+					"group together with",
+					"added in",
+					"updated in",
+					"ask for",
+					"removed in"
+				];
+
+				// Split the sentence into an array of words
+				let words = sentence.split(/\s+/);
+
+				// Take the first word from the array and remove it for later use
+				let firstWord = words.shift();
+
+				// Create a new modified sentence without the first word
+				let modifiedSentence = words.join(' ');
+
+				// Remove bracketed phrases
+				modifiedSentence = modifiedSentence.replace(/(<.*?>|{.*?}|\[.*?\])/g, "");
+
+				// Remove specified strings
+				phrasesToRemove.forEach((str) => {
+					modifiedSentence = modifiedSentence.replace(new RegExp(str + "\\s*\\S+", "gi"), "");
+				});
+
+				// Combine the first word with the remaining modified sentence
+				let finalSentence = `${firstWord} ${modifiedSentence}`;
+
+				// Return the final sentence as an array of words
+				return finalSentence.split(/\s+/);
+			}
+
 			function removeFirstWord(words) {	
 				let isNonAlphabetic = words[0].length < 3 && /^[^a-zA-Z]*$/.test(words[0]) && words[0].charAt(0) != "$";
 				let isSingleAlphabet = words[0].length < 2 && /^[a-zA-Z]{1}$/.test(words[0]) && !/^[ia]$/i.test(words[0]);
@@ -273,7 +237,7 @@ class Purge {
 			
 			function removeWhitespaceElements(words) {
 				// Filter the words using a callback function that returns true for strings that don't have only whitespaces
-				const result = words.filter(function (str) {
+				let result = words.filter(function (str) {
 					// Use regex to test if the current string contains only whitespaces
 					// If the string contains any other character, the test returns false, and we keep it in the array
 					return !/^\s*$/.test(str);
