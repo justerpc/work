@@ -131,7 +131,9 @@ class Purge {
 					"added in",
 					"updated in",
 					"ask for",
-					"removed in"
+					"removed in",
+					"show as header only if selected",
+					"show as header"
 				];
 				
 				// Remove bracketed phrases
