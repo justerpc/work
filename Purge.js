@@ -155,6 +155,8 @@ class Purge {
 					"fixed",
 					"monitor",
 					"response",
+					"locked",
+					"lock"
 				];
 
 				// Get the last word from the words array
