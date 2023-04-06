@@ -1,4 +1,4 @@
-/* * *   V E R S I O N   5 . 2   * * */
+/* * *   V E R S I O N   5 . 2 . 1   * * */
 
 document.querySelector("body").addEventListener("keydown", function(event) {
 	if(event.target.tagName.toLowerCase() === "textarea" && purge.isAssigned) {
@@ -131,12 +131,13 @@ class Purge {
 			
 			function removeFirstWord(words) {	
 				let isNonAlphabetic = words[0].length < 3 && /^[^a-zA-Z]*$/.test(words[0]) && words[0].charAt(0) != "$";
+				let isFirstWordNoAlphaRestAlpha = /^[^a-zA-Z]+$/.test(words[0]) && words.slice(1).every(word => /^[a-zA-Z]+$/.test(word)) && words[0].charAt(0) != "$";
 				let isSingleAlphabet = words[0].length < 2 && /^[a-zA-Z]{1}$/.test(words[0]) && !/^[ia]$/i.test(words[0]);
 				let isBracketsAlphabet = words[0].length > 1 && words[0].length < 3 && ((/^[a-zA-Z]{1}$/.test(words[0].charAt(0)) && /^[.,<>{}\[\]\(\)]{1}$/.test(words[0].charAt(1))) || (/^[.,<>{}\[\]\(\)]{1}$/.test(words[0].charAt(0)) && /^[a-zA-Z]{1}$/.test(words[0].charAt(1)))) && !/^[ia]$/i.test(words[0]);
 				let isBracketsNumeric = /^[\d<>\[\]{}()]+$/.test(words[0]);
 
 				// Remove the first word if any of the conditions are true
-				if (isNonAlphabetic || isSingleAlphabet || isBracketsAlphabet || isBracketsNumeric) {
+				if (isNonAlphabetic || isFirstWordNoAlphaRestAlpha || isSingleAlphabet || isBracketsAlphabet || isBracketsNumeric) {
 					words.splice(0, 1);
 				}
 				
