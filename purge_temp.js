@@ -86,7 +86,7 @@ class Canvas {
 
 const canvas = new Canvas();
 
-/* * *   V E R S I O N   6 . 1   * * */
+/* * *   V E R S I O N   5 . 2 . 1   * * */
 
 document.querySelector("body").addEventListener("keydown", function(event) {
 	if(event.target.tagName.toLowerCase() === "textarea" && purge.isAssigned) {
@@ -122,7 +122,7 @@ class Purge {
 		// Add Purge button to the web page
 		this.purgeBtn = document.createElement("button");
 		this.purgeBtn.setAttribute("id", "purgeBtn");
-		this.purgeBtn.textContent = this.projName + " All";
+		this.purgeBtn.textContent = this.projName + " Enabled";
 		document.body.appendChild(this.purgeBtn);
 		
 		// Add onclick listener to the textarea
@@ -131,16 +131,6 @@ class Purge {
 		function togglePurgeBtn() {
 			let purgeStatus = that.purgeBtn.textContent;
 			that.purgeBtn.textContent = ((purgeStatus === "Purge Disabled") ? "Purge Enabled" : "Purge Disabled");
-			
-			if(purgeStatus == "Purge Disabled") {
-				that.purgeBtn.textContent = "Purge All";
-			}
-			else if(purgeStatus == "Purge All") {
-				that.purgeBtn.textContent = "Purge PN";
-			}
-			else {
-				that.purgeBtn.textContent = "Purge Disabled";
-			}
 		}
 	}
 	
@@ -162,42 +152,35 @@ class Purge {
 
 			// Add an event listener for the "input" event
 			this.textarea.addEventListener("input", function(event) {
-				if(that.purgeBtn.textContent !== "Purge Disabled") {
+				if(that.purgeBtn.textContent === "Purge Enabled") {
 					// Clear any previous timeout
 					clearTimeout(timeoutID);
 
 					// Set a new timeout to execute the processing function after a delay of 500ms
-					timeoutID = setTimeout(processText(that.purgeBtn.textContent), 500);
+					timeoutID = setTimeout(processText(), 500);
 				}
 			});
 
-			function processText(mode) {
+			function processText() {
 				// Get the current value of the textarea and split it into an array of lines
 				let lines = that.textarea.value.split("\n");
 
 				// Loop through each line and split it into an array of words using whitespace as delimiter
 				for(let i = 0; i < lines.length; i++) {
-					if(mode === "Purge All") {
-						lines[i] = removeConsecutiveUnderscores(lines[i]);
-						lines[i] = removeSpecifiedPhrases(lines[i]);
-						lines[i] = removeFirstWord(lines[i]);
-						lines[i] = removeLastWord(lines[i]);
-					}
-					else if(mode === "Purge PN") {
-						lines[i] = removeConsecutiveUnderscores(lines[i]);
-						lines[i] = removeSpecifiedPhrasesExclFirstWord(lines[i]);
-						lines[i] = removeLastWord(lines[i]);
-					}
+					lines[i] = removeConsecutiveUnderscores(lines[i]);
+					lines[i] = removeSpecifiedPhrases(lines[i]);
+					lines[i] = removeFirstWord(lines[i]);
+					lines[i] = removeLastWord(lines[i]);
 					
 					// Join the array elements back into a single string
 					lines[i] = lines[i].join(" ");
 				}
 
 				// Join the lines back into a single string with each line separated by a newline character
-				let processedText = lines.join("\n");
+				const processedText = lines.join("\n");
 
 				// Replace any double spaces with single spaces
-				let cleanedText = processedText.replace(/[\t ]{2,}/g, " ");
+				const cleanedText = processedText.replace(/[\t ]{2,}/g, " ");
 
 				// Set the updated text as the new value of the textarea
 				that.textarea.value = cleanedText;
@@ -219,7 +202,10 @@ class Purge {
 					"added in",
 					"updated in",
 					"ask for",
-					"removed in"
+					"removed in",
+					"open end",
+					"show as header only if selected",
+					"show as header"
 				];
 				
 				// Remove bracketed phrases
@@ -233,41 +219,6 @@ class Purge {
 				return sentence.split(/\s+/);
 			}
 			
-			function removeSpecifiedPhrasesExclFirstWord(sentence) {
-				// Define an array of strings to be removed
-				let phrasesToRemove = [
-					"pair together with",
-					"group together with",
-					"added in",
-					"updated in",
-					"ask for",
-					"removed in"
-				];
-
-				// Split the sentence into an array of words
-				let words = sentence.split(/\s+/);
-
-				// Take the first word from the array and remove it for later use
-				let firstWord = words.shift();
-
-				// Create a new modified sentence without the first word
-				let modifiedSentence = words.join(' ');
-
-				// Remove bracketed phrases
-				modifiedSentence = modifiedSentence.replace(/(<.*?>|{.*?}|\[.*?\])/g, "");
-
-				// Remove specified strings
-				phrasesToRemove.forEach((str) => {
-					modifiedSentence = modifiedSentence.replace(new RegExp(str + "\\s*\\S+", "gi"), "");
-				});
-
-				// Combine the first word with the remaining modified sentence
-				let finalSentence = `${firstWord} ${modifiedSentence}`;
-
-				// Return the final sentence as an array of words
-				return finalSentence.split(/\s+/);
-			}
-
 			function removeFirstWord(words) {	
 				let isNonAlphabetic = words[0].length < 3 && /^[^a-zA-Z]*$/.test(words[0]) && words[0].charAt(0) != "$";
 				let isFirstWordNoAlphaRestAlpha = /^[\[\({]*(\d+(\.\d+)*|)[\.,_\[\]{}<>()]*?[\]\)}]*$/.test(words[0]) && words.slice(1).some(word => (/[a-zA-Z]/).test(word)) && words[0].charAt(0) != "$";
@@ -292,7 +243,10 @@ class Purge {
 					"shuffle",
 					"exclusive",
 					"fixed",
-					"monitor"
+					"monitor",
+					"response",
+					"locked",
+					"lock"
 				];
 
 				// Get the last word from the words array
@@ -326,7 +280,7 @@ class Purge {
 			
 			function removeWhitespaceElements(words) {
 				// Filter the words using a callback function that returns true for strings that don't have only whitespaces
-				let result = words.filter(function (str) {
+				const result = words.filter(function (str) {
 					// Use regex to test if the current string contains only whitespaces
 					// If the string contains any other character, the test returns false, and we keep it in the array
 					return !/^\s*$/.test(str);
