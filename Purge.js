@@ -1,15 +1,5 @@
 /* * *   V E R S I O N   5 . 2 . 1   * * */
 
-document.querySelector("body").addEventListener("keydown", function(event) {
-	if(event.target.tagName.toLowerCase() === "textarea" && purge.isAssigned) {
-		purge.purgeTextArea();
-	}
-	else {
-		purge.assignTextArea();
-		purge.purgeTextArea();
-	}
-});
-
 class Purge {
 	constructor() {
 		let that = this;
@@ -205,4 +195,14 @@ class Purge {
 	}
 }
 
-const purge = new Purge();
+let purge = new Purge();
+
+document.querySelector("body").addEventListener("keydown", function(event) {
+	if(event.target.tagName.toLowerCase() === "textarea" && purge.isAssigned) {
+		purge.purgeTextArea();
+	}
+	else {
+		purge.assignTextArea();
+		purge.purgeTextArea();
+	}
+});
