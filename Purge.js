@@ -1,4 +1,4 @@
-/* * *   V E R S I O N   5 . 2 . 1   * * */
+/* * *   V E R S I O N   5 . 2 . 2   * * */
 
 class Purge {
 	constructor() {
