@@ -1,4 +1,4 @@
-/* * *   V E R S I O N   5 . 2 . 2   * * */
+/* * *   V E R S I O N   5 . 2 . 4   * * */
 
 class Purge {
 	constructor() {
@@ -36,9 +36,11 @@ class Purge {
 		}
 	}
 	
-	assignTextArea() {
-		// Get the textarea element
-		this.textarea = document.getElementById("pastetxt");
+	assignTextArea(textAreaID) {
+		if(textAreaID === "pastetxt" || textAreaID === "inputText") {
+			// Get the textarea element
+			this.textarea = document.getElementById(textAreaID);
+		}
 		
 		if(this.textarea) {
 			this.isAssigned = true;
@@ -112,6 +114,10 @@ class Purge {
 				
 				// Remove bracketed phrases
 				sentence = sentence.replace(/(<.*?>|{.*?}|\[.*?\])/g, "");
+				
+				// Remove hashtags-enclosed phrases
+				let hashtagsPattern = /##.*?##/g;
+				sentence = sentence.replace(hashtagsPattern, '');
 				
 				// Remove specified strings
 				phrasesToRemove.forEach((str) => {
@@ -198,11 +204,10 @@ class Purge {
 let purge = new Purge();
 
 document.querySelector("body").addEventListener("keydown", function(event) {
-	if(event.target.tagName.toLowerCase() === "textarea" && purge.isAssigned) {
-		purge.purgeTextArea();
-	}
-	else {
-		purge.assignTextArea();
+	if(event.target.tagName.toLowerCase() === "textarea") {
+		let activeTextareaId = event.target.id;
+		
+		purge.assignTextArea(activeTextareaId);
 		purge.purgeTextArea();
 	}
 });
