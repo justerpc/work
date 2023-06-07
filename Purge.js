@@ -109,7 +109,8 @@ class Purge {
 					"removed in",
 					"open end",
 					"show as header only if selected",
-					"show as header"
+					"show as header",
+					"keep together with"
 				];
 				
 				// Remove bracketed phrases
