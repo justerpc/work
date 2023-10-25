@@ -1,4 +1,4 @@
-/* * *   V E R S I O N   5 . 2 . 4   * * */
+/* * *   V E R S I O N   5 . 2 . 6   * * */
 
 class Purge {
 	constructor() {
@@ -105,12 +105,12 @@ class Purge {
 					"group together with",
 					"added in",
 					"updated in",
-					"ask for",
 					"removed in",
 					"open end",
 					"show as header only if selected",
 					"show as header",
-					"keep together with"
+					"thank and terminate",
+					"if yes, thank and terminate"
 				];
 				
 				// Remove bracketed phrases
@@ -128,18 +128,30 @@ class Purge {
 				return sentence.split(/\s+/);
 			}
 			
-			function removeFirstWord(words) {	
+			function removeFirstWord(words) {
+				// Check if the first word starts with 'r' (case-insensitive) followed by any number
+				let isFirstWordRNumber = /^r\d+/i.test(words[0]);
+
+				// Check if the first word is non-alphabetic and has a length less than 3, and does not start with '$'
 				let isNonAlphabetic = words[0].length < 3 && /^[^a-zA-Z]*$/.test(words[0]) && words[0].charAt(0) != "$";
+
+				// Check if the first word has no alphabet but the rest of the words have at least one alphabet, and does not start with '$'
 				let isFirstWordNoAlphaRestAlpha = /^[\[\({]*(\d+(\.\d+)*|)[\.,_\[\]{}<>()]*?[\]\)}]*$/.test(words[0]) && words.slice(1).some(word => (/[a-zA-Z]/).test(word)) && words[0].charAt(0) != "$";
+
+				// Check if the first word is a single alphabet (excluding 'i' and 'a')
 				let isSingleAlphabet = words[0].length < 2 && /^[a-zA-Z]{1}$/.test(words[0]) && !/^[ia]$/i.test(words[0]);
+
+				// Check if the first word is an alphabet followed or preceded by a special character (excluding 'i' and 'a')
 				let isBracketsAlphabet = words[0].length > 1 && words[0].length < 3 && ((/^[a-zA-Z]{1}$/.test(words[0].charAt(0)) && /^[.,<>{}\[\]\(\)]{1}$/.test(words[0].charAt(1))) || (/^[.,<>{}\[\]\(\)]{1}$/.test(words[0].charAt(0)) && /^[a-zA-Z]{1}$/.test(words[0].charAt(1)))) && !/^[ia]$/i.test(words[0]);
+
+				// Check if the first word is a numeric value enclosed within brackets
 				let isBracketsNumeric = /^[\d<>\[\]{}()]+$/.test(words[0]);
 
 				// Remove the first word if any of the conditions are true
-				if (isNonAlphabetic || isFirstWordNoAlphaRestAlpha || isSingleAlphabet || isBracketsAlphabet || isBracketsNumeric) {
+				if (isFirstWordRNumber || isNonAlphabetic || isFirstWordNoAlphaRestAlpha || isSingleAlphabet || isBracketsAlphabet || isBracketsNumeric) {
 					words.splice(0, 1);
 				}
-				
+
 				return removeWhitespaceElements(words);
 			}
 			
