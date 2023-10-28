@@ -165,7 +165,6 @@ class Purge {
 					"exclusive",
 					"fixed",
 					"monitor",
-					"response",
 					"locked",
 					"lock"
 				];
