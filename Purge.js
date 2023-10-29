@@ -131,7 +131,6 @@ class Purge {
 			function removeFirstWord(words) {
 				// Roman numerals from 2 to 50
 				const romanNumerals = /^(II|III|IV|V|VI|VII|VIII|IX|X|XI|XII|XIII|XIV|XV|XVI|XVII|XVIII|XIX|XX|XXI|XXII|XXIII|XXIV|XXV|XXVI|XXVII|XXVIII|XXIX|XXX|XXXI|XXXII|XXXIII|XXXIV|XXXV|XXXVI|XXXVII|XXXVIII|XXXIX|XL|XLI|XLII|XLIII|XLIV|XLV|XLVI|XLVII|XLVIII|XLIX|L)$/i;
-
 				// Check if the first word is a Roman numeral
 				let isRomanNumeral = romanNumerals.test(words[0].toUpperCase());
 
@@ -140,15 +139,15 @@ class Purge {
 
 				// Check if the first word contains an underscore or ends with punctuation
 				let isEndWithPunctuation = /_/.test(words[0]) || 
-				(/[.]|[)]|[}]|[>]|[]]$/.test(words[0]) && words[0].length <= 5);
+										   (/[.]|[)]|[}]|[>]|[]]$/.test(words[0]) && words[0].length <= 5);
 
 				// Check if the first word starts with ( or [ or { or < and ends with ) or ] or } or >
 				let isEnclosedByBrackets = /^[(|[{|<].*[)|]|}|>]$/.test(words[0]);
 
-				// Check if the first word is a single special character (not numeric or alphabetic)
-				let isSpecialChar = /^\W$/.test(words[0]);
+				// Check if the first word is a single character that isn't a number or letter
+				let isSpecialChar = /^[^a-z0-9]{1}$/i.test(words[0]);
 
-				// Remove the first word if it satisfies one of the conditions
+				// Remove the first word if it is a Roman numeral, satisfies isPrecode, isEndWithPunctuation, isEnclosedByBrackets or isSpecialChar conditions
 				if (isRomanNumeral || isPrecode || isEndWithPunctuation || isEnclosedByBrackets || isSpecialChar) {
 					words.splice(0, 1);
 				}
