@@ -1,4 +1,4 @@
-/* * *   V E R S I O N   5 . 2 . 6   * * */
+/* * *   V E R S I O N   5 . 2 . 7   * * */
 
 class Purge {
 	constructor() {
@@ -129,26 +129,24 @@ class Purge {
 			}
 			
 			function removeFirstWord(words) {
-				// Check if the first word starts with 'r' (case-insensitive) followed by any number
-				let isFirstWordRNumber = /^r\d+/i.test(words[0]);
+				// Roman numerals from 2 to 50
+				const romanNumerals = /^(II|III|IV|V|VI|VII|VIII|IX|X|XI|XII|XIII|XIV|XV|XVI|XVII|XVIII|XIX|XX|XXI|XXII|XXIII|XXIV|XXV|XXVI|XXVII|XXVIII|XXIX|XXX|XXXI|XXXII|XXXIII|XXXIV|XXXV|XXXVI|XXXVII|XXXVIII|XXXIX|XL|XLI|XLII|XLIII|XLIV|XLV|XLVI|XLVII|XLVIII|XLIX|L)$/i;
 
-				// Check if the first word is non-alphabetic and has a length less than 3, and does not start with '$'
-				let isNonAlphabetic = words[0].length < 3 && /^[^a-zA-Z]*$/.test(words[0]) && words[0].charAt(0) != "$";
+				// Check if the first word is a Roman numeral
+				let isRomanNumeral = romanNumerals.test(words[0].toUpperCase());
 
-				// Check if the first word has no alphabet but the rest of the words have at least one alphabet, and does not start with '$'
-				let isFirstWordNoAlphaRestAlpha = /^[\[\({]*(\d+(\.\d+)*|)[\.,_\[\]{}<>()]*?[\]\)}]*$/.test(words[0]) && words.slice(1).some(word => (/[a-zA-Z]/).test(word)) && words[0].charAt(0) != "$";
+				// Check if the first word starts with c or q or r or s followed by a number
+				let isPrecode = /^[cqrs]\d+/i.test(words[0]);
 
-				// Check if the first word is a single alphabet (excluding 'i' and 'a')
-				let isSingleAlphabet = words[0].length < 2 && /^[a-zA-Z]{1}$/.test(words[0]) && !/^[ia]$/i.test(words[0]);
+				// Check if the first word contains an underscore or ends with punctuation
+				let isEndWithPunctuation = /_/.test(words[0]) || 
+										   (/[.]|[)]|[}]|[>]|[]]$/.test(words[0]) && words[0].length <= 5);
 
-				// Check if the first word is an alphabet followed or preceded by a special character (excluding 'i' and 'a')
-				let isBracketsAlphabet = words[0].length > 1 && words[0].length < 3 && ((/^[a-zA-Z]{1}$/.test(words[0].charAt(0)) && /^[.,<>{}\[\]\(\)]{1}$/.test(words[0].charAt(1))) || (/^[.,<>{}\[\]\(\)]{1}$/.test(words[0].charAt(0)) && /^[a-zA-Z]{1}$/.test(words[0].charAt(1)))) && !/^[ia]$/i.test(words[0]);
+				// Check if the first word starts with ( or [ or { or < and ends with ) or ] or } or >
+				let isEnclosedByBrackets = /^[(|[{|<].*[)|]|}|>]$/.test(words[0]);
 
-				// Check if the first word is a numeric value enclosed within brackets
-				let isBracketsNumeric = /^[\d<>\[\]{}()]+$/.test(words[0]);
-
-				// Remove the first word if any of the conditions are true
-				if (isFirstWordRNumber || isNonAlphabetic || isFirstWordNoAlphaRestAlpha || isSingleAlphabet || isBracketsAlphabet || isBracketsNumeric) {
+				// Remove the first word if it is a Roman numeral, satisfies isPrecode, isEndWithPunctuation or isEnclosedByBrackets conditions
+				if (isRomanNumeral || isPrecode || isEndWithPunctuation || isEnclosedByBrackets) {
 					words.splice(0, 1);
 				}
 
