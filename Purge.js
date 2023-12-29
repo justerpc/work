@@ -1,4 +1,4 @@
-/* * *   V E R S I O N   5 . 2 . 7   * * */
+/* * *   V E R S I O N   5 . 2 . 8   * * */
 
 class Purge {
 	constructor() {
@@ -37,9 +37,19 @@ class Purge {
 	}
 	
 	assignTextArea(textAreaID) {
+		let that = this;
+		
 		if(textAreaID === "pastetxt" || textAreaID === "inputText") {
 			// Get the textarea element
 			this.textarea = document.getElementById(textAreaID);
+		}
+		else {
+			const hostElement = document.querySelector('#draculaContainer');
+			
+			if(hostElement) {
+				const shadowRoot = hostElement.shadowRoot;
+				this.textarea = shadowRoot.querySelector('#inputText');
+			}
 		}
 		
 		if(this.textarea) {
@@ -138,8 +148,7 @@ class Purge {
 				let isPrecode = /^[cqrs]\d+/i.test(words[0]);
 
 				// Check if the first word contains an underscore or ends with punctuation
-				let isEndWithPunctuation = /_/.test(words[0]) || 
-										   (/[.]|[)]|[}]|[>]|[]]$/.test(words[0]) && words[0].length <= 5);
+				let isEndWithPunctuation = /_/.test(words[0]) || (/[\]._(){}>)]$/.test(words[0]) && words[0].length <= 5);
 
 				// Check if the first word starts with ( or [ or { or < and ends with ) or ] or } or >
 				let isEnclosedByBrackets = /^[(|[{|<].*[)|]|}|>]$/.test(words[0]);
@@ -223,3 +232,19 @@ document.querySelector("body").addEventListener("keydown", function(event) {
 		purge.purgeTextArea();
 	}
 });
+
+let hostElement = document.querySelector('#draculaContainer');
+
+if(hostElement) {
+	let shadowRoot = hostElement.shadowRoot;
+	
+	// Add event listener to the shadow root or directly to the textarea(s)
+	shadowRoot.addEventListener('keydown', function(event) {
+		if(event.target.tagName.toLowerCase() === "textarea") {
+			let activeTextareaId = false;
+			
+			purge.assignTextArea(activeTextareaId);
+			purge.purgeTextArea();
+		}
+	});
+}
