@@ -83,12 +83,13 @@ class Purge {
 				for(let i = 0; i < lines.length; i++) {
 					lines[i] = removeConsecutiveUnderscores(lines[i]);
 					lines[i] = removeSpecifiedPhrases(lines[i]);
-					lines[i] = removeLastWord(lines[i]);
 					
 					// Check if the active text area element has an ID of pastetxtCodes
 					if (that.textarea.id !== "pastetxtCodes") {
 						lines[i] = removeFirstWord(lines[i]);
 					}
+					
+					lines[i] = removeLastWord(lines[i]);
 					
 					// Join the array elements back into a single string
 					lines[i] = lines[i].join(" ");
@@ -248,6 +249,3 @@ if(hostElement) {
 		}
 	});
 }
-
-
-
