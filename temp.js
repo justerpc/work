@@ -1,4 +1,4 @@
-/* * *   V E R S I O N   6 . 1   * * */
+/* * *   V E R S I O N   B E T A   * * */
 
 document.querySelector("body").addEventListener("keydown", function(event) {
 	if(event.target.tagName.toLowerCase() === "textarea" && purge.isAssigned) {
