@@ -1,4 +1,4 @@
-/* * *   V E R S I O N   5 . 2 . 8   * * */
+/* * *   V E R S I O N   5 . 2 . 9   * * */
 
 class Purge {
 	constructor() {
@@ -39,7 +39,7 @@ class Purge {
 	assignTextArea(textAreaID) {
 		let that = this;
 		
-		if(textAreaID === "pastetxt" || textAreaID === "inputText") {
+		if(textAreaID === "pastetxt" || textAreaID === "pastetxtCodes" || textAreaID === "inputText") {
 			// Get the textarea element
 			this.textarea = document.getElementById(textAreaID);
 		}
@@ -83,7 +83,12 @@ class Purge {
 				for(let i = 0; i < lines.length; i++) {
 					lines[i] = removeConsecutiveUnderscores(lines[i]);
 					lines[i] = removeSpecifiedPhrases(lines[i]);
-					lines[i] = removeFirstWord(lines[i]);
+					
+					// Check if the active text area element has an ID of pastetxtCodes
+					if (that.textarea.id !== "pastetxtCodes") {
+						lines[i] = removeFirstWord(lines[i]);
+					}
+					
 					lines[i] = removeLastWord(lines[i]);
 					
 					// Join the array elements back into a single string
@@ -113,10 +118,6 @@ class Purge {
 				let phrasesToRemove = [
 					"pair together with",
 					"group together with",
-					"added in",
-					"updated in",
-					"removed in",
-					"open end",
 					"show as header only if selected",
 					"show as header",
 					"thank and terminate",
