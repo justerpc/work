@@ -1,92 +1,4 @@
-/* * *   V E R S I O N   2   * * */
-
-class Canvas {
-	constructor() {
-		let that = this;
-		
-		// Create and add CSS styles to the page
-		this.style = document.createElement('style');
-		this.projName = "Canvas";
-		
-		this.style.textContent = `
-			#canvasBtn {
-				position: fixed;
-				bottom: 0;
-				right: 0;
-				margin: 1em;
-				z-index: 10000;
-			}
-			
-			#canvas {
-				display: none;
-				position: fixed;
-				bottom: 0;
-				left: 0;
-				right: 0;
-				background-color: #f2f2f2;
-				padding: 20px;
-				max-height: 60vh;
-				overflow-y: auto;
-				z-index: 9999;
-				font-family: Arial, Helvetica, sans-serif;
-			}
-			
-			#inputWrapper {
-				display: block;
-				width: 100%;
-				gap: 10px;
-			}
-			
-			#inputText {
-				width: 100%;
-				margin: 10px 0;
-				padding: 5px;
-				font-size: 16px;
-				border: none;
-				border-radius: 3px;
-				box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
-			}
-		`;
-
-		document.head.appendChild(this.style);
-		
-		// Create and add the container
-		this.canvas = document.createElement("div");
-		this.canvas.setAttribute("id", "canvas");
-		document.body.appendChild(this.canvas);
-		
-		// Show or hide the container when the canvas button is clicked
-		this.canvasBtn = document.createElement("button");
-		this.canvasBtn.setAttribute("id", "canvasBtn");
-		this.canvasBtn.textContent = this.projName;
-		this.canvasBtn.onclick = toggleCanvas;
-		document.body.appendChild(this.canvasBtn);
-
-		function toggleCanvas() {
-			let canvasStyle = window.getComputedStyle(that.canvas);
-			let displayValue = canvasStyle.getPropertyValue("display");
-			
-			that.canvas.style.display = displayValue === "none" ? "flex" : "none";
-			that.canvasBtn.textContent = displayValue === "none" ? "Close" : that.projName;
-		}
-		
-		// Create and add the input wrapper
-		this.inputWrapper = document.createElement("div");
-		this.inputWrapper.setAttribute("id", "inputWrapper");
-		this.canvas.appendChild(this.inputWrapper);
-
-		// Create and add the text area
-		this.inputText = document.createElement("textarea");
-		this.inputText.setAttribute("id", "pastetxt");
-		this.inputText.setAttribute("rows", "15em");
-		this.inputText.setAttribute("placeholder", "Enter your text here...");
-		this.inputWrapper.appendChild(this.inputText);
-	}
-}
-
-const canvas = new Canvas();
-
-/* * *   V E R S I O N   5 . 2 . 2   * * */
+/* * *   V E R S I O N   5 . 2 . 9   * * */
 
 class Purge {
 	constructor() {
@@ -124,9 +36,21 @@ class Purge {
 		}
 	}
 	
-	assignTextArea() {
-		// Get the textarea element
-		this.textarea = document.getElementById("pastetxt");
+	assignTextArea(textAreaID) {
+		let that = this;
+		
+		if(textAreaID === "pastetxt" || textAreaID === "pastetxtCodes" || textAreaID === "inputText") {
+			// Get the textarea element
+			this.textarea = document.getElementById(textAreaID);
+		}
+		else {
+			const hostElement = document.querySelector('#draculaContainer');
+			
+			if(hostElement) {
+				const shadowRoot = hostElement.shadowRoot;
+				this.textarea = shadowRoot.querySelector('#inputText');
+			}
+		}
 		
 		if(this.textarea) {
 			this.isAssigned = true;
@@ -159,8 +83,12 @@ class Purge {
 				for(let i = 0; i < lines.length; i++) {
 					lines[i] = removeConsecutiveUnderscores(lines[i]);
 					lines[i] = removeSpecifiedPhrases(lines[i]);
-					lines[i] = removeFirstWord(lines[i]);
 					lines[i] = removeLastWord(lines[i]);
+					
+					// Check if the active text area element has an ID of pastetxtCodes
+					if (that.textarea.id !== "pastetxtCodes") {
+						lines[i] = removeFirstWord(lines[i]);
+					}
 					
 					// Join the array elements back into a single string
 					lines[i] = lines[i].join(" ");
@@ -189,17 +117,18 @@ class Purge {
 				let phrasesToRemove = [
 					"pair together with",
 					"group together with",
-					"added in",
-					"updated in",
-					"ask for",
-					"removed in",
-					"open end",
 					"show as header only if selected",
-					"show as header"
+					"show as header",
+					"thank and terminate",
+					"if yes, thank and terminate"
 				];
 				
 				// Remove bracketed phrases
 				sentence = sentence.replace(/(<.*?>|{.*?}|\[.*?\])/g, "");
+				
+				// Remove hashtags-enclosed phrases
+				let hashtagsPattern = /##.*?##/g;
+				sentence = sentence.replace(hashtagsPattern, '');
 				
 				// Remove specified strings
 				phrasesToRemove.forEach((str) => {
@@ -209,18 +138,29 @@ class Purge {
 				return sentence.split(/\s+/);
 			}
 			
-			function removeFirstWord(words) {	
-				let isNonAlphabetic = words[0].length < 3 && /^[^a-zA-Z]*$/.test(words[0]) && words[0].charAt(0) != "$";
-				let isFirstWordNoAlphaRestAlpha = /^[\[\({]*(\d+(\.\d+)*|)[\.,_\[\]{}<>()]*?[\]\)}]*$/.test(words[0]) && words.slice(1).some(word => (/[a-zA-Z]/).test(word)) && words[0].charAt(0) != "$";
-				let isSingleAlphabet = words[0].length < 2 && /^[a-zA-Z]{1}$/.test(words[0]) && !/^[ia]$/i.test(words[0]);
-				let isBracketsAlphabet = words[0].length > 1 && words[0].length < 3 && ((/^[a-zA-Z]{1}$/.test(words[0].charAt(0)) && /^[.,<>{}\[\]\(\)]{1}$/.test(words[0].charAt(1))) || (/^[.,<>{}\[\]\(\)]{1}$/.test(words[0].charAt(0)) && /^[a-zA-Z]{1}$/.test(words[0].charAt(1)))) && !/^[ia]$/i.test(words[0]);
-				let isBracketsNumeric = /^[\d<>\[\]{}()]+$/.test(words[0]);
+			function removeFirstWord(words) {
+				// Roman numerals from 2 to 50
+				const romanNumerals = /^(II|III|IV|V|VI|VII|VIII|IX|X|XI|XII|XIII|XIV|XV|XVI|XVII|XVIII|XIX|XX|XXI|XXII|XXIII|XXIV|XXV|XXVI|XXVII|XXVIII|XXIX|XXX|XXXI|XXXII|XXXIII|XXXIV|XXXV|XXXVI|XXXVII|XXXVIII|XXXIX|XL|XLI|XLII|XLIII|XLIV|XLV|XLVI|XLVII|XLVIII|XLIX|L)$/i;
+				// Check if the first word is a Roman numeral
+				let isRomanNumeral = romanNumerals.test(words[0].toUpperCase());
 
-				// Remove the first word if any of the conditions are true
-				if (isNonAlphabetic || isFirstWordNoAlphaRestAlpha || isSingleAlphabet || isBracketsAlphabet || isBracketsNumeric) {
+				// Check if the first word starts with c or q or r or s followed by a number
+				let isPrecode = /^[cqrs]\d+/i.test(words[0]);
+
+				// Check if the first word contains an underscore or ends with punctuation
+				let isEndWithPunctuation = /_/.test(words[0]) || (/[\]._(){}>)]$/.test(words[0]) && words[0].length <= 5);
+
+				// Check if the first word starts with ( or [ or { or < and ends with ) or ] or } or >
+				let isEnclosedByBrackets = /^[(|[{|<].*[)|]|}|>]$/.test(words[0]);
+
+				// Check if the first word is a single character that isn't a number or letter
+				let isSpecialChar = /^[^a-z0-9]{1}$/i.test(words[0]);
+
+				// Remove the first word if it is a Roman numeral, satisfies isPrecode, isEndWithPunctuation, isEnclosedByBrackets or isSpecialChar conditions
+				if (isRomanNumeral || isPrecode || isEndWithPunctuation || isEnclosedByBrackets || isSpecialChar) {
 					words.splice(0, 1);
 				}
-				
+
 				return removeWhitespaceElements(words);
 			}
 			
@@ -234,7 +174,6 @@ class Purge {
 					"exclusive",
 					"fixed",
 					"monitor",
-					"response",
 					"locked",
 					"lock"
 				];
@@ -286,11 +225,29 @@ class Purge {
 let purge = new Purge();
 
 document.querySelector("body").addEventListener("keydown", function(event) {
-	if(event.target.tagName.toLowerCase() === "textarea" && purge.isAssigned) {
-		purge.purgeTextArea();
-	}
-	else {
-		purge.assignTextArea();
+	if(event.target.tagName.toLowerCase() === "textarea") {
+		let activeTextareaId = event.target.id;
+		
+		purge.assignTextArea(activeTextareaId);
 		purge.purgeTextArea();
 	}
 });
+
+let hostElement = document.querySelector('#draculaContainer');
+
+if(hostElement) {
+	let shadowRoot = hostElement.shadowRoot;
+	
+	// Add event listener to the shadow root or directly to the textarea(s)
+	shadowRoot.addEventListener('keydown', function(event) {
+		if(event.target.tagName.toLowerCase() === "textarea") {
+			let activeTextareaId = false;
+			
+			purge.assignTextArea(activeTextareaId);
+			purge.purgeTextArea();
+		}
+	});
+}
+
+
+
