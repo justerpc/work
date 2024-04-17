@@ -229,7 +229,7 @@ class Purge {
 			
 			function removeWhitespaceElements(words) {
 				// Filter the words using a callback function that returns true for strings that don't have only whitespaces
-				const result = words.filter(function (str) {
+				let result = words.filter(function (str) {
 					// Use regex to test if the current string contains only whitespaces
 					// If the string contains any other character, the test returns false, and we keep it in the array
 					return !/^\s*$/.test(str);
