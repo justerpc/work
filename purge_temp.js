@@ -1,4 +1,4 @@
-/* * *   V E R S I O N   5 . 2 . 9   * * */
+/* * *   V E R S I O N   5 . 3 . 0   * * */
 
 class Purge {
 	constructor() {
@@ -89,7 +89,7 @@ class Purge {
 						lines[i] = removeFirstWord(lines[i]);
 					}
 					else {
-						//lines[i] = removeFirstWordBraces(lines[i]);
+						lines[i] = removeFirstWordBraces(lines[i]);
 					}
 					
 					lines[i] = removeLastWord(lines[i]);
