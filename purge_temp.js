@@ -178,7 +178,7 @@ class Purge {
 					pattern = /[\(\)\{\}\[\]<>]/g;
 					
 					// Replace all occurrences of the pattern in the string with an empty string
-					result = words[0].replace(pattern, '');
+					words[0] = words[0].replace(pattern, '');
 				}
 				
 				return removeWhitespaceElements(words);
