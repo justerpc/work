@@ -168,7 +168,7 @@ class Purge {
 				return removeWhitespaceElements(words);
 			}
 
-			function removeFirstWordBraces($str) {
+			function removeFirstWordBraces(str) {
 				// Check if the first word starts with ( or [ or { or < and ends with ) or ] or } or >
 				let isEnclosedByBrackets = /^[(|[{|<].*[)|]|}|>]$/.test(words[0]);
 				
