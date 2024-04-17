@@ -175,7 +175,7 @@ class Purge {
 				// Remove the first word if it satisfies isEnclosedByBrackets condition
 				if (isEnclosedByBrackets) {
 					// Regular expression to match any kind of bracket
-					pattern = /[\(\)\{\}\[\]<>]/g;
+					let pattern = /[\(\)\{\}\[\]<>]/g;
 					
 					// Replace all occurrences of the pattern in the string with an empty string
 					words[0] = words[0].replace(pattern, '');
