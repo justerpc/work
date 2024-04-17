@@ -82,11 +82,14 @@ class Purge {
 				// Loop through each line and split it into an array of words using whitespace as delimiter
 				for(let i = 0; i < lines.length; i++) {
 					lines[i] = removeConsecutiveUnderscores(lines[i]);
-					lines[i] = removeSpecifiedPhrases(lines[i]);
 					
 					// Check if the active text area element has an ID of pastetxtCodes
 					if (that.textarea.id !== "pastetxtCodes") {
+						lines[i] = removeSpecifiedPhrases(lines[i]);
 						lines[i] = removeFirstWord(lines[i]);
+					}
+					else {
+						//lines[i] = removeFirstWordBraces(lines[i]);
 					}
 					
 					lines[i] = removeLastWord(lines[i]);
@@ -163,6 +166,28 @@ class Purge {
 				}
 
 				return removeWhitespaceElements(words);
+			}
+
+			function removeFirstWordBraces($str) {
+			    // Find the first word/number in the string that might include curly braces
+			    preg_match('/{?(\w+)}?/', $str, $matches);
+			
+			    // Check if we found a match
+			    if (!empty($matches)) {
+			        // The actual first word/number is in the first capturing group
+			        $firstWord = $matches[1];
+			        
+			        // Remove the matched portion from the original string
+			        $restOfString = substr($str, strlen($matches[0]));
+			
+			        // Construct the new string without braces around the first word/number
+			        $newString = $firstWord . $restOfString;
+			
+			        return $newString;
+			    }
+			
+			    // Return the original string if no word/number is found at the beginning
+			    return $str;
 			}
 			
 			function removeLastWord(words) {
