@@ -181,7 +181,7 @@ class Purge {
 					words[0] = words[0].replace(pattern, '');
 				}
 				
-				return removeWhitespaceElements(words);
+				return words;
 			}
 			
 			function removeLastWord(words) {
