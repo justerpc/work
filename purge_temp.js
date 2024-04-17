@@ -169,25 +169,19 @@ class Purge {
 			}
 
 			function removeFirstWordBraces($str) {
-			    // Find the first word/number in the string that might include curly braces
-			    preg_match('/{?(\w+)}?/', $str, $matches);
-			
-			    // Check if we found a match
-			    if (!empty($matches)) {
-			        // The actual first word/number is in the first capturing group
-			        $firstWord = $matches[1];
-			        
-			        // Remove the matched portion from the original string
-			        $restOfString = substr($str, strlen($matches[0]));
-			
-			        // Construct the new string without braces around the first word/number
-			        $newString = $firstWord . $restOfString;
-			
-			        return $newString;
-			    }
-			
-			    // Return the original string if no word/number is found at the beginning
-			    return $str;
+				// Check if the first word starts with ( or [ or { or < and ends with ) or ] or } or >
+				let isEnclosedByBrackets = /^[(|[{|<].*[)|]|}|>]$/.test(words[0]);
+				
+				// Remove the first word if it satisfies isEnclosedByBrackets condition
+				if (isEnclosedByBrackets) {
+					// Regular expression to match any kind of bracket
+					pattern = /[{}()\[\]<>]/g;
+					
+					// Replace all occurrences of the pattern in the string with an empty string
+					result = words[0].replace(pattern, '');
+				}
+				
+				return removeWhitespaceElements(words);
 			}
 			
 			function removeLastWord(words) {
