@@ -174,13 +174,13 @@ function removeFirstWord(words) {
 }
 
 function removeFirstWordBrackets(sentence) {
-	sentence = sentence.split(/\s+/);
-	
+    sentence = sentence.split(/\s+/);
+    
     if (sentence[0].length > 0 && /^[\[\(\<\{].*[\]\)\>\}]$/.test(sentence[0])) {
-        // Replace opening and closing brackets from the first word
-        sentence[0] = sentence[0].replace(/^[\[\(\<\{]/, '').replace(/[\]\)\>\}]$/, '');
+        // Replace opening and closing brackets from the first word and add an HTML tab entity
+        sentence[0] = sentence[0].replace(/^[\[\(\<\{]/, '').replace(/[\]\)\>\}]$/, '') + '&#9;';
     }
-	
+    
     return removeWhitespaceElements(sentence);
 }
 
