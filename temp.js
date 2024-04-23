@@ -85,11 +85,11 @@ class Purge {
 					
 					// Check if the active text area element has an ID of pastetxtCodes
 					if (that.textarea.id !== "pastetxtCodes") {
-						lines[i] = removeSpecifiedPhrases(lines[i]);
-						lines[i] = removeFirstWord(lines[i]);
+						lines[i] = removeFirstWordBrackets(lines[i]);
 					}
 					else {
-						lines[i] = removeFirstWordBrackets(lines[i]);
+						lines[i] = removeSpecifiedPhrases(lines[i]);
+						lines[i] = removeFirstWord(lines[i]);
 					}
 					
 					lines[i] = removeLastWord(lines[i]);
@@ -226,9 +226,16 @@ function removeLastWord(words) {
 }
 
 function removeWhitespaceElements(words) {
-    if (!Array.isArray(words)) {
-        throw new TypeError("Expected an array, but received " + typeof words);
+    // Check if words is a string and convert it to an array by splitting into individual words or characters
+    if (typeof words === 'string') {
+        words = words.split(/\s+/);  // Split the string by whitespace to turn it into an array of words
     }
+
+    // Check if words is now an array
+    if (!Array.isArray(words)) {
+        throw new TypeError("Expected an array or a string, but received " + typeof words);
+    }
+
     // Filter the words using a callback function that returns true for strings that don't have only whitespaces
     const result = words.filter(function (str) {
         // Use regex to test if the current string contains only whitespaces
