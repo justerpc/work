@@ -174,6 +174,12 @@ function removeFirstWord(words) {
 }
 
 function removeFirstWordBrackets(sentence) {
+    // Reference to the textarea element
+    var textarea = document.getElementById('pastetxtCodes');
+
+    // Ensure the textarea preserves whitespace
+    textarea.style.whiteSpace = 'pre-wrap';
+
     sentence = sentence.split(/\s+/);
     
     if (sentence[0].length > 0 && /^[\[\(\<\{].*[\]\)\>\}]$/.test(sentence[0])) {
