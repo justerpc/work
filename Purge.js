@@ -82,10 +82,10 @@ class Purge {
 				// Loop through each line and split it into an array of words using whitespace as delimiter
 				for(let i = 0; i < lines.length; i++) {
 					lines[i] = removeConsecutiveUnderscores(lines[i]);
-					lines[i] = removeSpecifiedPhrases(lines[i]);
 					
 					// Check if the active text area element has an ID of pastetxtCodes
 					if (that.textarea.id !== "pastetxtCodes") {
+						lines[i] = removeSpecifiedPhrases(lines[i]);
 						lines[i] = removeFirstWord(lines[i]);
 					}
 					
