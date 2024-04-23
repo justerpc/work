@@ -85,11 +85,11 @@ class Purge {
 					
 					// Check if the active text area element has an ID of pastetxtCodes
 					if (that.textarea.id !== "pastetxtCodes") {
-						lines[i] = removeFirstWordBrackets(lines[i]);
-					}
-					else {
 						lines[i] = removeSpecifiedPhrases(lines[i]);
 						lines[i] = removeFirstWord(lines[i]);
+					}
+					else {
+						lines[i] = removeFirstWordBrackets(lines[i]);
 					}
 					
 					lines[i] = removeLastWord(lines[i]);
@@ -173,13 +173,15 @@ function removeFirstWord(words) {
 	return removeWhitespaceElements(words);
 }
 
-function removeFirstWordBrackets(words) {
-    if (words.length > 0 && /^[\[\(\<\{].*[\]\)\>\}]$/.test(words[0])) {
-        // Replace opening and closing brackets from the first word
-        words[0] = words[0].replace(/^[\[\(\<\{]/, '').replace(/[\]\)\>\}]$/, '');
+function removeFirstWordBrackets(sentence) {
+    sentence = sentence.split(/\s+/);
+    
+    if (sentence[0].length > 0 && /^[\[\(\<\{].*[\]\)\>\}]$/.test(sentence[0])) {
+        // Replace opening and closing brackets from the first word and add a tab character
+        sentence[0] = sentence[0].replace(/^[\[\(\<\{]/, '').replace(/[\]\)\>\}]$/, '') + '\t';
     }
-	
-    return removeWhitespaceElements(words);
+    
+    return removeWhitespaceElements(sentence);
 }
 
 function removeLastWord(words) {
