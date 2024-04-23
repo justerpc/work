@@ -184,8 +184,7 @@ function removeFirstWordBrackets(sentence) {
     return removeWhitespaceElements(sentence);
 }
 
-function removeLastWord(sentence) {
-	words = sentence.split(/\s+/);
+function removeLastWord(words) {
 	// Define the words to remove
 	let wordsToRemove = [
 		"terminate",
@@ -199,13 +198,8 @@ function removeLastWord(sentence) {
 		"lock"
 	];
 
-	// Get the last word from the words array
-	let lastWord = words[words.length - 1];
-
 	// Step 1: Remove the last word if it is enclosed in brackets
-	if (/^[\[\]<>{].*[\}\]>]$/.test(lastWord)) {
-		words.splice(words.length - 1, 1);
-	}
+	words[words.length - 1] = words[words.length - 1].replace(/(<.*?>|{.*?}|\[.*?\])/g, "");
 	
 	// Step 2: Remove the last word if it matches a word in wordsToRemove
 	lastWord = words[words.length - 1];
