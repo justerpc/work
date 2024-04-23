@@ -226,15 +226,17 @@ function removeLastWord(words) {
 }
 
 function removeWhitespaceElements(words) {
-	// Filter the words using a callback function that returns true for strings that don't have only whitespaces
-	const result = words.filter(function (str) {
-		// Use regex to test if the current string contains only whitespaces
-		// If the string contains any other character, the test returns false, and we keep it in the array
-		return !/^\s*$/.test(str);
-	});
+    if (!Array.isArray(words)) {
+        throw new TypeError("Expected an array, but received " + typeof words);
+    }
+    // Filter the words using a callback function that returns true for strings that don't have only whitespaces
+    const result = words.filter(function (str) {
+        // Use regex to test if the current string contains only whitespaces
+        return !/^\s*$/.test(str);
+    });
 
-	// Return the modified array
-	return result;
+    // Return the modified array
+    return result;
 }
 
 /* * * * * *   h e l p e r   f u n c t i o n s   * * * * */
