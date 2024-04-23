@@ -178,14 +178,16 @@ function removeFirstWordBrackets(sentence) {
     
     if (sentence[0].length > 0 && /^[\[\(\<\{].*[\]\)\>\}]$/.test(sentence[0])) {
         // Replace opening and closing brackets from the first word and add a tab character
-        sentence[0] = sentence[0].replace(/^[\[\(\<\{]/, '').replace(/[\]\)\>\}]$/, '') + '	';
+        sentence[0] = sentence[0].replace(/^[\[\(\<\{]/, '').replace(/[\]\)\>\}]$/, '') + '.';
     }
     
     return removeWhitespaceElements(sentence);
 }
 
-function removeLastWord(sentence) {
-	words = sentence.split(/\s+/);
+function removeLastWord(words) {
+	if (typeof words === 'string') {
+	        words = words.split(/\s+/);  // Split the string by whitespace to turn it into an array of words
+	    }
 	
 	// Define the words to remove
 	let wordsToRemove = [
