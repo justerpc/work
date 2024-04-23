@@ -184,7 +184,9 @@ function removeFirstWordBrackets(sentence) {
     return removeWhitespaceElements(sentence);
 }
 
-function removeLastWord(words) {
+function removeLastWord(sentence) {
+	words = sentence.split(/\s+/);
+	
 	// Define the words to remove
 	let wordsToRemove = [
 		"terminate",
