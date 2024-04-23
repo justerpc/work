@@ -174,17 +174,11 @@ function removeFirstWord(words) {
 }
 
 function removeFirstWordBrackets(sentence) {
-    // Reference to the textarea element
-    var textarea = document.getElementById('pastetxtCodes');
-
-    // Ensure the textarea preserves whitespace
-    textarea.style.whiteSpace = 'pre-wrap';
-
     sentence = sentence.split(/\s+/);
     
     if (sentence[0].length > 0 && /^[\[\(\<\{].*[\]\)\>\}]$/.test(sentence[0])) {
         // Replace opening and closing brackets from the first word and add a tab character
-        sentence[0] = sentence[0].replace(/^[\[\(\<\{]/, '').replace(/[\]\)\>\}]$/, '') + '\t';
+        sentence[0] = sentence[0].replace(/^[\[\(\<\{]/, '').replace(/[\]\)\>\}]$/, '') + '	';
     }
     
     return removeWhitespaceElements(sentence);
