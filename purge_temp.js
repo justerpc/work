@@ -173,13 +173,15 @@ function removeFirstWord(words) {
 	return removeWhitespaceElements(words);
 }
 
-function removeFirstWordBrackets(words) {
-    if (words.length > 0 && /^[\[\(\<\{].*[\]\)\>\}]$/.test(words[0])) {
+function removeFirstWordBrackets(sentence) {
+	sentence = sentence.split(/\s+/);
+	
+    if (sentence[0].length > 0 && /^[\[\(\<\{].*[\]\)\>\}]$/.test(sentence[0])) {
         // Replace opening and closing brackets from the first word
-        words[0] = words[0].replace(/^[\[\(\<\{]/, '').replace(/[\]\)\>\}]$/, '');
+        sentence[0] = sentence[0].replace(/^[\[\(\<\{]/, '').replace(/[\]\)\>\}]$/, '');
     }
 	
-    return removeWhitespaceElements(words);
+    return removeWhitespaceElements(sentence);
 }
 
 function removeLastWord(words) {
