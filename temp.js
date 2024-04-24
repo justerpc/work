@@ -179,7 +179,7 @@ function removeFirstWordBrackets(sentence) {
     // Check if the first word contains any type of bracket
     if (words[0].length > 0 && /[\[\(\{\<\]\)\}\>]/.test(words[0])) {
         // Remove all types of brackets from the first word
-        words[0] = words[0].replace(/[\[\(\{\<\]\)\}\>]/g, '');
+        words[0] = words[0].replace(/[\[\(\{\<\]\)\}\>]/g, '') + '.';
     }
     
     return removeWhitespaceElements(words);
